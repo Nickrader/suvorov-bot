@@ -101,19 +101,19 @@ int main(int argc, char* argv[]) {
     coordinator.LoadSettings(argc, argv);
 
     // NOTE (alkurbatov): Uncomment to start the game in full screen mode.
-    // coordinator.SetFullScreen(true);
+    coordinator.SetFullScreen(true);
 
     // NOTE (alkurbatov): Uncomment to play at normal speed.
-    // coordinator.SetRealtime(true);
+    coordinator.SetRealtime(true);
 
     Dispatcher bot("TrainingDummy");
     coordinator.SetParticipants({
-        CreateParticipant(sc2::Race::Random, &bot, "Suvorov"),
+        CreateParticipant(sc2::Race::Terran, &bot, "Suvorov"),
         CreateComputer(
             sc2::Race::Random,
-            sc2::Difficulty::CheatInsane,
+            sc2::Difficulty::Hard,
             sc2::AIBuild::Rush,
-            "CheatInsane"
+            "Hard"
         )
     });
 

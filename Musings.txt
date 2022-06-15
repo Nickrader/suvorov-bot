@@ -1,0 +1,38 @@
+Musings::Suvorov Bot
+
+SuvBot uses .cpp file to schedule a build order.  Also in .cpp file leaves room to implement some logic.
+e.g. MarinePush.cpp
+That file is called in 'void Dispatcher::OnGameStart()' in Dispatcher.cpp
+
+--------------------------------------------------------------------
+General::
+
+1.  Check refinery has no more than 3 workers...
+	check # of workers?  Do always want 3 per geyser? yes, unless special case.
+	
+2.  Create zone (semi-circle, triangle, trapezoid, etc.) where building does not occur (mineral/gas lines)
+	cache point2d refinery, minerals.  
+	operate on those values to create range or list of values to not build on.
+	(more advanced chache map info and use that.)
+	
+
+3.  Place first depot at main ramp edge.  
+	Mapanalyzer may be helpful on this.  Or hardcoding locations based on ladder map used? 
+	(more try-hard, less automated/derived/generic)
+
+4.  natual expansion should make OC before making 1st SCV.
+
+-----------------------------------------------------------------------------------
+** need to supply map path on command line **
+.\Suvorov.exe "Ladder2019Season3/AcropolisLE.SC2Map"
+
+GameLoops per second = 22.4
+
+ Eventually, it would be best to use a cached build_grid (0.5x0.5 cells) and mark those cells as reserved/off-limits
+		which intersect a line segment between the base and each mineral/geyser.
+		https://github.com/alkurbatov/suvorov-bot/issues/43
+	
+https://github.com/alkurbatov/suvorov-bot/issues/11
+Marine Micro:  Be nice to have callable basics, like 
+https://www.youtube.com/c/StarcraftAcademy
+

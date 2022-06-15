@@ -1,0 +1,410 @@
+#4294967295 [INFO] dispatcher: Playing against an opponent with id TrainingDummy
+#0 [INFO] dispatcher: New game started!
+#0 [INFO] dispatcher: TERRAN_COMMANDCENTER(4347920385) was created
+#0 [INFO] hub: Capture region: (142.5, 33.5)
+#0 [INFO] dispatcher: TERRAN_SCV(4348182529) was created
+#0 [INFO] dispatcher: TERRAN_SCV(4349231105) was created
+#0 [INFO] dispatcher: TERRAN_SCV(4350279681) was created
+#0 [INFO] dispatcher: TERRAN_SCV(4350803969) was created
+#0 [INFO] dispatcher: TERRAN_SCV(4351066113) was created
+#0 [INFO] dispatcher: TERRAN_SCV(4350541825) was created
+#0 [INFO] dispatcher: TERRAN_SCV(4350017537) was created
+#0 [INFO] dispatcher: TERRAN_SCV(4349755393) was created
+#0 [INFO] dispatcher: TERRAN_SCV(4349493249) was created
+#0 [INFO] dispatcher: TERRAN_SCV(4348968961) was created
+#0 [INFO] dispatcher: TERRAN_SCV(4348706817) was created
+#0 [INFO] dispatcher: TERRAN_SCV(4348444673) was created
+#0 [INFO] dispatcher: TERRAN_COMMANDCENTER(4347920385) is idle
+#0 [INFO] builder: Started building a SCV
+#1 [INFO] builder: Started building a SCV
+#273 [INFO] dispatcher: TERRAN_SCV(4354998273) was created
+#273 [INFO] dispatcher: TERRAN_COMMANDCENTER(4347920385) is idle
+#273 [INFO] builder: Started building a SCV
+#390 [INFO] builder: Started building a SupplyDepot
+#391 [INFO] dispatcher: Placeholder of TERRAN_SUPPLYDEPOT was detected
+#420 [INFO] dispatcher: TERRAN_SUPPLYDEPOT(4355260417) was created
+#545 [INFO] dispatcher: TERRAN_SCV(4355784705) was created
+#545 [INFO] dispatcher: TERRAN_COMMANDCENTER(4347920385) is idle
+#545 [INFO] builder: Started building a SCV
+#817 [INFO] dispatcher: TERRAN_SCV(4356046849) was created
+#817 [INFO] dispatcher: TERRAN_COMMANDCENTER(4347920385) is idle
+#900 [INFO] dispatcher: TERRAN_SUPPLYDEPOT(4355260417) constructed
+#900 [INFO] dispatcher: TERRAN_SUPPLYDEPOT(4355260417) is idle
+#900 [INFO] builder: Started building a Barracks
+#900 [INFO] builder: Started building a SCV
+#913 [INFO] dispatcher: TERRAN_SCV(4349755393) is idle
+#913 [INFO] hub: Our busy worker has finished task
+#947 [INFO] dispatcher: TERRAN_BARRACKS(4356833281) was created
+#1172 [INFO] dispatcher: TERRAN_SCV(4357357569) was created
+#1172 [INFO] dispatcher: TERRAN_COMMANDCENTER(4347920385) is idle
+#1172 [INFO] builder: Started building a SCV
+#1444 [INFO] dispatcher: TERRAN_SCV(4357881857) was created
+#1444 [INFO] dispatcher: TERRAN_COMMANDCENTER(4347920385) is idle
+#1444 [INFO] builder: Started building a SCV
+#1690 [INFO] builder: Started building a CommandCenter
+#1716 [INFO] dispatcher: TERRAN_SCV(4358668289) was created
+#1716 [INFO] dispatcher: TERRAN_COMMANDCENTER(4347920385) is idle
+#1776 [INFO] builder: Started building a SCV
+#1865 [INFO] dispatcher: TERRAN_COMMANDCENTER(4358930433) was created
+#1865 [INFO] hub: Capture region: (144.5, 58.5)
+#1896 [INFO] hub: Claim object NEUTRAL_SPACEPLATFORMGEYSER
+#1896 [INFO] builder: Started building a Refinery
+#1930 [INFO] dispatcher: TERRAN_REFINERY(4359192577) was created
+#1930 [INFO] hub: Release claimed geyser
+#1930 [INFO] hub: Capture object TERRAN_REFINERY
+#1987 [INFO] dispatcher: TERRAN_BARRACKS(4356833281) constructed
+#1987 [INFO] dispatcher: TERRAN_BARRACKS(4356833281) is idle
+#1987 [INFO] strategy.marine_push: Schedule Marine training
+#1987 [INFO] builder: Started building a Marine
+#2001 [INFO] dispatcher: TERRAN_SCV(4355784705) is idle
+#2001 [INFO] hub: Our busy worker has finished task
+#2048 [INFO] dispatcher: TERRAN_SCV(4359454721) was created
+#2048 [INFO] dispatcher: TERRAN_COMMANDCENTER(4347920385) is idle
+#2192 [INFO] builder: Started building a OrbitalCommand
+#2387 [INFO] dispatcher: TERRAN_MARINE(4360503297) was created
+#2387 [INFO] strategy: TERRAN_MARINE added to attack group
+#2387 [INFO] dispatcher: TERRAN_BARRACKS(4356833281) is idle
+#2387 [INFO] strategy.marine_push: Schedule Marine training
+#2387 [INFO] dispatcher: TERRAN_MARINE(4360503297) is idle
+#2387 [INFO] builder: Started building a Marine
+#2388 [INFO] plugin.quarter_master: Request additional supplies: 23.95 >= 23
+#2400 [INFO] builder: Started building a SupplyDepot
+#2410 [INFO] dispatcher: TERRAN_REFINERY(4359192577) constructed
+#2410 [INFO] dispatcher: TERRAN_REFINERY(4359192577) is idle
+#2428 [INFO] dispatcher: TERRAN_SUPPLYDEPOT(4360765441) was created
+#2716 [INFO] builder: Started building a Barracks
+#2751 [INFO] plugin.quarter_master: Request additional supplies: 22.2 >= 16
+#2752 [INFO] dispatcher: TERRAN_ORBITALCOMMAND(4347920385) constructed
+#2752 [INFO] dispatcher: TERRAN_ORBITALCOMMAND(4347920385) is idle
+#2753 [INFO] dispatcher: TERRAN_ORBITALCOMMAND(4347920385) is idle
+#2763 [INFO] dispatcher: TERRAN_BARRACKS(4362076161) was created
+#2787 [INFO] dispatcher: TERRAN_MARINE(4362338305) was created
+#2787 [INFO] strategy: TERRAN_MARINE added to attack group
+#2787 [INFO] dispatcher: TERRAN_BARRACKS(4356833281) is idle
+#2787 [INFO] strategy.marine_push: Schedule Marine training
+#2787 [INFO] dispatcher: TERRAN_MARINE(4362338305) is idle
+#2787 [INFO] builder: Started building a BarracksTechLab
+#2788 [INFO] dispatcher: TERRAN_BARRACKSTECHLAB(4362600449) was created
+#2817 [INFO] dispatcher: TERRAN_MULE(4361814017) was created
+#2901 [INFO] builder: Started building a SCV
+#2908 [INFO] dispatcher: TERRAN_SUPPLYDEPOT(4360765441) constructed
+#2908 [INFO] dispatcher: TERRAN_SUPPLYDEPOT(4360765441) is idle
+#2921 [INFO] dispatcher: TERRAN_SCV(4351066113) is idle
+#2921 [INFO] hub: Our busy worker has finished task
+#2962 [INFO] builder: Started building a Marine
+#3043 [INFO] builder: Started building a SupplyDepot
+#3114 [INFO] dispatcher: TERRAN_SUPPLYDEPOT(4363911169) was created
+#3173 [INFO] dispatcher: TERRAN_SCV(4364435457) was created
+#3173 [INFO] dispatcher: TERRAN_ORBITALCOMMAND(4347920385) is idle
+#3173 [INFO] builder: Started building a SCV
+#3187 [INFO] dispatcher: TERRAN_BARRACKSTECHLAB(4362600449) constructed
+#3187 [INFO] dispatcher: TERRAN_BARRACKS(4356833281) is idle
+#3187 [INFO] strategy.marine_push: Schedule Marine training
+#3187 [INFO] dispatcher: TERRAN_BARRACKSTECHLAB(4362600449) is idle
+#3211 [INFO] builder: Started building a Marine
+#3401 [INFO] builder: Started building a Barracks
+#3445 [INFO] dispatcher: TERRAN_SCV(4365221889) was created
+#3445 [INFO] dispatcher: TERRAN_ORBITALCOMMAND(4347920385) is idle
+#3465 [INFO] dispatcher: TERRAN_COMMANDCENTER(4358930433) constructed
+#3465 [INFO] dispatcher: TERRAN_COMMANDCENTER(4358930433) is idle
+#3479 [INFO] dispatcher: TERRAN_SCV(4348444673) is idle
+#3479 [INFO] hub: Our busy worker has finished task
+#3481 [INFO] dispatcher: TERRAN_MARINE(4360503297) is idle
+#3498 [INFO] dispatcher: TERRAN_BARRACKS(4365746177) was created
+#3516 [INFO] builder: Started building a SCV
+#3562 [INFO] builder: Started building a SCV
+#3594 [INFO] dispatcher: TERRAN_SUPPLYDEPOT(4363911169) constructed
+#3594 [INFO] dispatcher: TERRAN_SUPPLYDEPOT(4363911169) is idle
+#3597 [INFO] dispatcher: TERRAN_MARINE(4362338305) is idle
+#3605 [INFO] dispatcher: TERRAN_SCV(4348706817) is idle
+#3605 [INFO] hub: Our busy worker has finished task
+#3611 [INFO] dispatcher: TERRAN_MARINE(4366532609) was created
+#3611 [INFO] strategy: TERRAN_MARINE added to attack group
+#3611 [INFO] dispatcher: TERRAN_BARRACKS(4356833281) is idle
+#3611 [INFO] strategy.marine_push: Schedule Marine training
+#3611 [INFO] dispatcher: TERRAN_MARINE(4366532609) is idle
+#3651 [INFO] builder: Started building a Marine
+#3778 [INFO] builder: Started building a ShieldWall
+#3788 [INFO] dispatcher: TERRAN_SCV(4367319041) was created
+#3788 [INFO] dispatcher: TERRAN_ORBITALCOMMAND(4347920385) is idle
+#3803 [INFO] dispatcher: TERRAN_BARRACKS(4362076161) constructed
+#3803 [INFO] dispatcher: TERRAN_BARRACKS(4362076161) is idle
+#3803 [INFO] strategy.marine_push: Schedule Marine training
+#3816 [INFO] dispatcher: TERRAN_SCV(4349755393) is idle
+#3816 [INFO] hub: Our busy worker has finished task
+#3833 [INFO] builder: Started building a SCV
+#3834 [INFO] dispatcher: TERRAN_SCV(4367581185) was created
+#3834 [INFO] dispatcher: TERRAN_COMMANDCENTER(4358930433) is idle
+#3834 [INFO] dispatcher: TERRAN_SCV(4367581185) is idle
+#3898 [INFO] builder: Started building a Marine
+#3977 [INFO] builder: Started building a SCV
+#4051 [INFO] dispatcher: TERRAN_MARINE(4368891905) was created
+#4051 [INFO] strategy: TERRAN_MARINE added to attack group
+#4051 [INFO] dispatcher: TERRAN_BARRACKS(4356833281) is idle
+#4051 [INFO] strategy.marine_push: Schedule Marine training
+#4051 [INFO] dispatcher: TERRAN_MARINE(4368891905) is idle
+#4051 [INFO] builder: Started building a Marine
+#4105 [INFO] dispatcher: TERRAN_SCV(4369416193) was created
+#4105 [INFO] dispatcher: TERRAN_ORBITALCOMMAND(4347920385) is idle
+#4105 [INFO] builder: Started building a SCV
+#4172 [INFO] dispatcher: TERRAN_MARINE(4366532609) is idle
+#4238 [INFO] dispatcher: TERRAN_MULE(4370202625) was created
+#4249 [INFO] dispatcher: TERRAN_SCV(4370464769) was created
+#4249 [INFO] dispatcher: TERRAN_COMMANDCENTER(4358930433) is idle
+#4249 [INFO] dispatcher: TERRAN_SCV(4370464769) is idle
+#4249 [INFO] builder: Started building a SCV
+#4261 [INFO] dispatcher: TERRAN_MULE(4361814017) was destroyed
+#4298 [INFO] dispatcher: TERRAN_SCV(4348444673) was destroyed
+#4298 [INFO] hub: Our busy worker was destroyed
+#4298 [INFO] dispatcher: TERRAN_MARINE(4370726913) was created
+#4298 [INFO] strategy: TERRAN_MARINE added to attack group
+#4298 [INFO] dispatcher: TERRAN_MARINE(4370726913) is idle
+#4298 [INFO] dispatcher: TERRAN_BARRACKS(4362076161) is idle
+#4298 [INFO] strategy.marine_push: Schedule Marine training
+#4298 [INFO] builder: Started building a Marine
+#4309 [INFO] dispatcher: TERRAN_MARINE(4360503297) is idle
+#4377 [INFO] dispatcher: TERRAN_SCV(4370989057) was created
+#4377 [INFO] dispatcher: TERRAN_ORBITALCOMMAND(4347920385) is idle
+#4377 [INFO] builder: Started building a SCV
+#4417 [INFO] dispatcher: TERRAN_SCV(4355784705) was destroyed
+#4417 [INFO] hub: Our busy worker was destroyed
+#4435 [INFO] dispatcher: TERRAN_MARINE(4366532609) is idle
+#4451 [INFO] dispatcher: TERRAN_MARINE(4355784706) was created
+#4451 [INFO] strategy: TERRAN_MARINE added to attack group
+#4451 [INFO] dispatcher: TERRAN_BARRACKS(4356833281) is idle
+#4451 [INFO] strategy.marine_push: Schedule Marine training
+#4451 [INFO] dispatcher: TERRAN_MARINE(4355784706) is idle
+#4451 [INFO] builder: Started building a Marine
+#4521 [INFO] dispatcher: TERRAN_SCV(4371513345) was created
+#4521 [INFO] dispatcher: TERRAN_COMMANDCENTER(4358930433) is idle
+#4521 [INFO] dispatcher: TERRAN_SCV(4371513345) is idle
+#4521 [INFO] builder: Started building a SCV
+#4529 [INFO] dispatcher: TERRAN_SCV(4367581185) was destroyed
+#4529 [INFO] hub: Our busy worker was destroyed
+#4538 [INFO] dispatcher: TERRAN_BARRACKS(4365746177) constructed
+#4538 [INFO] dispatcher: TERRAN_BARRACKS(4365746177) is idle
+#4538 [INFO] strategy.marine_push: Schedule Marine training
+#4548 [INFO] builder: Started building a Marine
+#4550 [INFO] dispatcher: TERRAN_SCV(4364435457) is idle
+#4550 [INFO] hub: Our busy worker has finished task
+#4593 [INFO] dispatcher: TERRAN_MARINE(4360503297) is idle
+#4642 [INFO] dispatcher: TERRAN_SCV(4370464769) was destroyed
+#4642 [INFO] hub: Our busy worker was destroyed
+#4649 [INFO] dispatcher: TERRAN_SCV(4370464770) was created
+#4649 [INFO] dispatcher: TERRAN_ORBITALCOMMAND(4347920385) is idle
+#4649 [INFO] builder: Started building a SCV
+#4663 [INFO] dispatcher: TERRAN_SCV(4370989057) was destroyed
+#4663 [INFO] hub: Our busy worker was destroyed
+#4698 [INFO] dispatcher: TERRAN_MARINE(4367581186) was created
+#4698 [INFO] strategy: TERRAN_MARINE added to attack group
+#4698 [INFO] dispatcher: TERRAN_BARRACKS(4362076161) is idle
+#4698 [INFO] strategy.marine_push: Schedule Marine training
+#4698 [INFO] dispatcher: TERRAN_MARINE(4367581186) is idle
+#4708 [INFO] builder: Started building a Marine
+#4720 [INFO] dispatcher: TERRAN_SCV(4371513345) was destroyed
+#4720 [INFO] hub: Our busy worker was destroyed
+#4793 [INFO] dispatcher: TERRAN_SCV(4371513346) was created
+#4793 [INFO] dispatcher: TERRAN_COMMANDCENTER(4358930433) is idle
+#4793 [INFO] dispatcher: TERRAN_SCV(4371513346) is idle
+#4793 [INFO] builder: Started building a SCV
+#4805 [INFO] dispatcher: TERRAN_MARINE(4367581186) is idle
+#4839 [INFO] dispatcher: TERRAN_SCV(4351066113) was destroyed
+#4839 [INFO] hub: Our busy worker was destroyed
+#4851 [INFO] dispatcher: TERRAN_MARINE(4351066114) was created
+#4851 [INFO] strategy: TERRAN_MARINE added to attack group
+#4851 [INFO] dispatcher: TERRAN_MARINE(4351066114) is idle
+#4851 [INFO] dispatcher: TERRAN_BARRACKS(4356833281) is idle
+#4851 [INFO] strategy.marine_push: Schedule Marine training
+#4860 [INFO] dispatcher: TERRAN_SCV(4356046849) was destroyed
+#4860 [INFO] hub: Our busy worker was destroyed
+#4867 [INFO] builder: Started building a Marine
+#4898 [INFO] dispatcher: TERRAN_SCV(4371513346) was destroyed
+#4898 [INFO] hub: Our busy worker was destroyed
+#4921 [INFO] dispatcher: TERRAN_SCV(4371513347) was created
+#4921 [INFO] dispatcher: TERRAN_ORBITALCOMMAND(4347920385) is idle
+#4924 [INFO] builder: Started building a SCV
+#4925 [INFO] dispatcher: TERRAN_SCV(4350803969) was destroyed
+#4925 [INFO] hub: Our busy worker was destroyed
+#4939 [INFO] dispatcher: TERRAN_COMMANDCENTER(4358930433) was destroyed
+#4939 [INFO] hub: Lost region: (144.5, 58.5)
+#4939 [INFO] dispatcher: TERRAN_SCV(4359454721) is idle
+#4939 [INFO] hub: Our busy worker has finished task
+#4939 [INFO] plugin.quarter_master: Request additional supplies: 39.35 >= 39
+#4940 [INFO] dispatcher: TERRAN_SCV(4348706817) is idle
+#4940 [INFO] hub: Our busy worker has finished task
+#4940 [INFO] dispatcher: TERRAN_SCV(4369416193) is idle
+#4940 [INFO] hub: Our busy worker has finished task
+#4948 [INFO] dispatcher: TERRAN_MARINE(4358930434) was created
+#4948 [INFO] strategy: TERRAN_MARINE added to attack group
+#4948 [INFO] dispatcher: TERRAN_MARINE(4358930434) is idle
+#4948 [INFO] dispatcher: TERRAN_BARRACKS(4365746177) is idle
+#4948 [INFO] strategy.marine_push: Schedule Marine training
+#4948 [INFO] builder: Started building a Marine
+#4972 [INFO] dispatcher: TERRAN_MARINE(4367581186) is idle
+#5053 [INFO] dispatcher: TERRAN_MARINE(4360503297) is idle
+#5056 [INFO] dispatcher: TERRAN_MARINE(4362338305) is idle
+#5104 [INFO] dispatcher: TERRAN_MARINE(4358930434) was destroyed
+#5108 [INFO] dispatcher: TERRAN_MARINE(4358930435) was created
+#5108 [INFO] strategy: TERRAN_MARINE added to attack group
+#5108 [INFO] dispatcher: TERRAN_MARINE(4358930435) is idle
+#5108 [INFO] dispatcher: TERRAN_BARRACKS(4362076161) is idle
+#5108 [INFO] strategy.marine_push: Schedule Marine training
+#5108 [INFO] builder: Started building a Marine
+#5134 [INFO] dispatcher: TERRAN_MARINE(4367581186) is idle
+#5148 [INFO] dispatcher: TERRAN_SCV(4367319041) is idle
+#5148 [INFO] hub: Our busy worker has finished task
+#5148 [INFO] dispatcher: TERRAN_SCV(4349755393) is idle
+#5148 [INFO] hub: Our busy worker has finished task
+#5149 [INFO] dispatcher: TERRAN_SCV(4371513347) is idle
+#5149 [INFO] hub: Our busy worker has finished task
+#5169 [INFO] dispatcher: TERRAN_MARINE(4367581186) was destroyed
+#5184 [INFO] builder: Started building a SupplyDepot
+#5190 [INFO] dispatcher: TERRAN_MARINE(4358930435) was destroyed
+#5192 [INFO] dispatcher: TERRAN_MARINE(4370726913) was destroyed
+#5196 [INFO] dispatcher: TERRAN_SCV(4370726914) was created
+#5196 [INFO] dispatcher: TERRAN_ORBITALCOMMAND(4347920385) is idle
+#5239 [INFO] builder: Started building a SCV
+#5246 [INFO] dispatcher: TERRAN_MARINE(4351066114) was destroyed
+#5257 [INFO] dispatcher: TERRAN_SUPPLYDEPOT(4351066115) was created
+#5259 [INFO] dispatcher: TERRAN_MARINE(4368891905) was destroyed
+#5267 [INFO] dispatcher: TERRAN_MARINE(4368891906) was created
+#5267 [INFO] strategy: TERRAN_MARINE added to attack group
+#5267 [INFO] dispatcher: TERRAN_BARRACKS(4356833281) is idle
+#5267 [INFO] strategy.marine_push: Schedule Marine training
+#5267 [INFO] dispatcher: TERRAN_MARINE(4368891906) is idle
+#5276 [INFO] dispatcher: TERRAN_MARINE(4360503297) was destroyed
+#5283 [INFO] dispatcher: TERRAN_MARINE(4355784706) was destroyed
+#5293 [INFO] dispatcher: TERRAN_MARINE(4362338305) was destroyed
+#5304 [INFO] dispatcher: TERRAN_MARINE(4366532609) was destroyed
+#5308 [INFO] dispatcher: TERRAN_MARINE(4368891906) was destroyed
+#5344 [INFO] builder: Started building a Marine
+#5348 [INFO] dispatcher: TERRAN_MARINE(4368891907) was created
+#5348 [INFO] strategy: TERRAN_MARINE added to attack group
+#5348 [INFO] dispatcher: TERRAN_BARRACKS(4365746177) is idle
+#5348 [INFO] strategy.marine_push: Schedule Marine training
+#5348 [INFO] dispatcher: TERRAN_MARINE(4368891907) is idle
+#5370 [INFO] dispatcher: TERRAN_MARINE(4368891907) was destroyed
+#5381 [INFO] dispatcher: TERRAN_SCV(4369416193) is idle
+#5381 [INFO] hub: Our busy worker has finished task
+#5387 [INFO] dispatcher: TERRAN_SCV(4371513347) is idle
+#5387 [INFO] hub: Our busy worker has finished task
+#5389 [INFO] dispatcher: TERRAN_SCV(4370726914) is idle
+#5389 [INFO] hub: Our busy worker has finished task
+#5406 [INFO] builder: Started building a Marine
+#5432 [INFO] dispatcher: TERRAN_SCV(4350279681) was destroyed
+#5432 [INFO] hub: Our busy worker was destroyed
+#5459 [INFO] dispatcher: TERRAN_SCV(4371513347) was destroyed
+#5462 [INFO] dispatcher: TERRAN_SCV(4370726914) was destroyed
+#5462 [INFO] hub: Our busy worker was destroyed
+#5478 [INFO] dispatcher: TERRAN_SCV(4349493249) was destroyed
+#5478 [INFO] hub: Our busy worker was destroyed
+#5499 [INFO] dispatcher: TERRAN_SCV(4359454721) is idle
+#5499 [INFO] hub: Our busy worker has finished task
+#5505 [INFO] dispatcher: TERRAN_SCV(4350017537) was destroyed
+#5505 [INFO] hub: Our busy worker was destroyed
+#5508 [INFO] dispatcher: TERRAN_MARINE(4350017538) was created
+#5508 [INFO] strategy: TERRAN_MARINE added to attack group
+#5508 [INFO] dispatcher: TERRAN_BARRACKS(4362076161) is idle
+#5508 [INFO] strategy.marine_push: Schedule Marine training
+#5508 [INFO] dispatcher: TERRAN_MARINE(4350017538) is idle
+#5511 [INFO] dispatcher: TERRAN_SCV(4370726915) was created
+#5511 [INFO] dispatcher: TERRAN_ORBITALCOMMAND(4347920385) is idle
+#5521 [INFO] builder: Started building a Marine
+#5525 [INFO] dispatcher: TERRAN_SCV(4349755393) is idle
+#5525 [INFO] hub: Our busy worker has finished task
+#5526 [INFO] dispatcher: TERRAN_SCV(4369416193) is idle
+#5526 [INFO] hub: Our busy worker has finished task
+#5527 [INFO] dispatcher: TERRAN_MARINE(4350017538) was destroyed
+#5531 [INFO] dispatcher: TERRAN_SCV(4349755393) was destroyed
+#5533 [INFO] dispatcher: TERRAN_SCV(4369416193) was destroyed
+#5538 [INFO] dispatcher: TERRAN_BARRACKSTECHLAB(4362600449) is idle
+#5538 [INFO] dispatcher: SHIELDWALL completed
+#5544 [INFO] dispatcher: TERRAN_SCV(4370726915) is idle
+#5544 [INFO] hub: Our busy worker has finished task
+#5552 [INFO] dispatcher: TERRAN_SCV(4349231105) is idle
+#5552 [INFO] hub: Our busy worker has finished task
+#5596 [INFO] dispatcher: TERRAN_ORBITALCOMMAND(4347920385) is idle
+#5614 [INFO] dispatcher: TERRAN_SCV(4349231105) is idle
+#5614 [INFO] hub: Our busy worker has finished task
+#5614 [INFO] dispatcher: TERRAN_SCV(4370726915) is idle
+#5614 [INFO] hub: Our busy worker has finished task
+#5630 [INFO] dispatcher: TERRAN_SCV(4359454721) was destroyed
+#5630 [INFO] hub: Our busy worker was destroyed
+#5632 [INFO] dispatcher: TERRAN_SCV(4349231105) was destroyed
+#5634 [INFO] dispatcher: TERRAN_SCV(4370726915) was destroyed
+#5660 [INFO] dispatcher: TERRAN_MULE(4349755394) was created
+#5668 [INFO] dispatcher: TERRAN_MULE(4349755394) was destroyed
+#5682 [INFO] dispatcher: TERRAN_MULE(4370202625) was destroyed
+#5685 [INFO] dispatcher: TERRAN_SCV(4350541825) was destroyed
+#5685 [INFO] hub: Our busy worker was destroyed
+#5698 [INFO] dispatcher: TERRAN_SCV(4348182529) was destroyed
+#5698 [INFO] hub: Our busy worker was destroyed
+#5701 [INFO] dispatcher: TERRAN_SCV(4365221889) was destroyed
+#5701 [INFO] hub: Our busy worker was destroyed
+#5714 [INFO] dispatcher: TERRAN_SCV(4364435457) was destroyed
+#5714 [INFO] hub: Our busy worker was destroyed
+#5717 [INFO] dispatcher: TERRAN_SCV(4370464770) was destroyed
+#5717 [INFO] hub: Our busy worker was destroyed
+#5732 [INFO] dispatcher: TERRAN_SCV(4348706817) was destroyed
+#5732 [INFO] hub: Our busy worker was destroyed
+#5737 [INFO] dispatcher: TERRAN_SUPPLYDEPOT(4351066115) constructed
+#5737 [INFO] dispatcher: TERRAN_SUPPLYDEPOT(4351066115) is idle
+#5744 [INFO] dispatcher: TERRAN_MARINE(4348706818) was created
+#5744 [INFO] strategy: TERRAN_MARINE added to attack group
+#5744 [INFO] dispatcher: TERRAN_BARRACKS(4356833281) is idle
+#5744 [INFO] strategy.marine_push: Schedule Marine training
+#5744 [INFO] dispatcher: TERRAN_MARINE(4348706818) is idle
+#5750 [INFO] dispatcher: TERRAN_SCV(4367319041) is idle
+#5750 [INFO] hub: Our busy worker has finished task
+#5787 [INFO] dispatcher: TERRAN_MARINE(4348706818) was destroyed
+#5806 [INFO] dispatcher: TERRAN_MARINE(4348706819) was created
+#5806 [INFO] strategy: TERRAN_MARINE added to attack group
+#5806 [INFO] dispatcher: TERRAN_BARRACKS(4365746177) is idle
+#5806 [INFO] strategy.marine_push: Schedule Marine training
+#5806 [INFO] dispatcher: TERRAN_MARINE(4348706819) is idle
+#5921 [INFO] dispatcher: TERRAN_MARINE(4363649026) was created
+#5921 [INFO] strategy: TERRAN_MARINE added to attack group
+#5921 [INFO] dispatcher: TERRAN_BARRACKS(4362076161) is idle
+#5921 [INFO] strategy.marine_push: Schedule Marine training
+#5921 [INFO] dispatcher: TERRAN_MARINE(4363649026) is idle
+#5927 [INFO] dispatcher: TERRAN_MARINE(4348706819) was destroyed
+#5942 [INFO] dispatcher: TERRAN_MARINE(4363649026) was destroyed
+#5956 [INFO] dispatcher: TERRAN_SCV(4367319041) was destroyed
+#5956 [INFO] hub: Our busy worker was destroyed
+#6226 [INFO] dispatcher: TERRAN_ORBITALCOMMAND(4347920385) was destroyed
+#6226 [INFO] hub: Lost region: (142.5, 33.5)
+#6504 [INFO] dispatcher: TERRAN_BARRACKS(4356833281) was destroyed
+#6694 [INFO] dispatcher: TERRAN_BARRACKS(4362076161) was destroyed
+#6755 [INFO] dispatcher: TERRAN_SCV(4357357569) is idle
+#6755 [INFO] hub: Our busy worker has finished task
+#6778 [INFO] dispatcher: TERRAN_SCV(4348968961) is idle
+#6778 [INFO] hub: Our busy worker has finished task
+#6811 [INFO] dispatcher: TERRAN_SCV(4358668289) is idle
+#6811 [INFO] hub: Our busy worker has finished task
+#6844 [INFO] dispatcher: TERRAN_SCV(4357881857) is idle
+#6844 [INFO] hub: Our busy worker has finished task
+#6877 [INFO] dispatcher: TERRAN_SCV(4354998273) is idle
+#6877 [INFO] hub: Our busy worker has finished task
+#6912 [INFO] dispatcher: TERRAN_SCV(4357357569) is idle
+#6912 [INFO] hub: Our busy worker has finished task
+#6947 [INFO] dispatcher: TERRAN_BARRACKS(4365746177) was destroyed
+#6948 [INFO] dispatcher: TERRAN_SCV(4357357569) is idle
+#6948 [INFO] hub: Our busy worker has finished task
+#7045 [INFO] dispatcher: TERRAN_TECHLAB(4362600449) was destroyed
+#7109 [INFO] dispatcher: TERRAN_SCV(4357357569) was destroyed
+#7109 [INFO] hub: Our busy worker was destroyed
+#7127 [INFO] dispatcher: TERRAN_SCV(4348968961) was destroyed
+#7127 [INFO] hub: Our busy worker was destroyed
+#7134 [INFO] dispatcher: TERRAN_SCV(4354998273) was destroyed
+#7134 [INFO] hub: Our busy worker was destroyed
+#7139 [INFO] dispatcher: TERRAN_SCV(4357881857) was destroyed
+#7139 [INFO] hub: Our busy worker was destroyed
+#7141 [INFO] dispatcher: TERRAN_SCV(4358668289) was destroyed
+#7141 [INFO] hub: Our busy worker was destroyed
+#7275 [INFO] dispatcher: TERRAN_SUPPLYDEPOT(4355260417) was destroyed
+#7412 [INFO] dispatcher: TERRAN_REFINERY(4359192577) was destroyed
+#7412 [INFO] hub: Release object TERRAN_REFINERY
+#7447 [INFO] dispatcher: TERRAN_SUPPLYDEPOT(4360765441) was destroyed
+#7580 [INFO] dispatcher: TERRAN_SUPPLYDEPOT(4363911169) was destroyed
+#7661 [INFO] dispatcher: Game over!
+#7661 [INFO] plugin.diagnosis: Replay saved
