@@ -101,10 +101,10 @@ int main(int argc, char* argv[]) {
     coordinator.LoadSettings(argc, argv);
 
     // NOTE (alkurbatov): Uncomment to start the game in full screen mode.
-    coordinator.SetFullScreen(true);
+    // coordinator.SetFullScreen(true);
 
     // NOTE (alkurbatov): Uncomment to play at normal speed.
-    coordinator.SetRealtime(true);
+    // coordinator.SetRealtime(true);
 
     Dispatcher bot("TrainingDummy");
     coordinator.SetParticipants({

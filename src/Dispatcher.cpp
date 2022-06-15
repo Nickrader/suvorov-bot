@@ -19,6 +19,7 @@
 #include "strategies/protoss/ChargelotPush.h"
 #include "strategies/terran/MarinePush.h"
 #include "strategies/zerg/ZerglingFlood.h"
+#include "strategies/terran/ZappBrannigan.h"
 
 #include <sc2api/sc2_common.h>
 #include <sc2api/sc2_unit.h>
@@ -59,7 +60,8 @@ void Dispatcher::OnGameStart() {
         m_plugins.emplace_back(new WarpSmith());
         m_plugins.emplace_back(new ChargelotPush());
     } else if (current_race == sc2::Race::Terran) {
-        m_plugins.emplace_back(new MarinePush());
+         //m_plugins.emplace_back(new MarinePush());
+        m_plugins.emplace_back(new Killbots());
     } else if (current_race == sc2::Race::Zerg) {
         m_plugins.emplace_back(new ExtraDrone());
         m_plugins.emplace_back(new ZerglingFlood());
