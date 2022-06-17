@@ -19,6 +19,6 @@ private:
     bool Should_Build_Expansion();
     bool to_build_or_not_to_build = false;
 
-    int number_of_townhalls = 1; // we start with a command center.
+    int number_of_townhalls = 1; // we start with one command center.
     int number_of_barracks = 0; 
 };

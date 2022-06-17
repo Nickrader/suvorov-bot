@@ -33,6 +33,7 @@ void Killbots::OnStep(Builder* builder_) {
           builder_->ScheduleObligatoryOrder(sc2::UNIT_TYPEID::TERRAN_BARRACKS);
           ++number_of_barracks;
       }
+  Strategy::OnStep(builder_);
 }
 
 void Killbots::OnUnitIdle(const sc2::Unit* unit_, Builder* builder_) {

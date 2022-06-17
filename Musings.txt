@@ -13,8 +13,7 @@ General::
 2.  Create zone (semi-circle, triangle, trapezoid, etc.) where building does not occur (mineral/gas lines)
 	cache point2d refinery, minerals.  
 	operate on those values to create range or list of values to not build on.
-	(more advanced chache map info and use that.)
-	
+	(more advanced chache map info and use that; per ImpulseCloud.)	
 
 3.  Place first depot at main ramp edge.  
 	Mapanalyzer may be helpful on this.  Or hardcoding locations based on ladder map used? 
@@ -27,11 +26,13 @@ General::
 .\Suvorov.exe "Ladder2019Season3/AcropolisLE.SC2Map"
 
 GameLoops per second = 22.4
+--------------------------------------
 
  Eventually, it would be best to use a cached build_grid (0.5x0.5 cells) and mark those cells as reserved/off-limits
 		which intersect a line segment between the base and each mineral/geyser.
 		https://github.com/alkurbatov/suvorov-bot/issues/43
-	
+
+---------------------------------------	
 https://github.com/alkurbatov/suvorov-bot/issues/11
 Marine Micro:  Be nice to have callable basics, like 
 https://www.youtube.com/c/StarcraftAcademy
