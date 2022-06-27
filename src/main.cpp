@@ -111,9 +111,9 @@ int main(int argc, char* argv[]) {
         CreateParticipant(sc2::Race::Terran, &bot, "Suvorov"),
         CreateComputer(
             sc2::Race::Random,
-            sc2::Difficulty::Hard,
+            sc2::Difficulty::VeryHard,
             sc2::AIBuild::Rush,
-            "Hard"
+            "VeryHard"
         )
     });
 
