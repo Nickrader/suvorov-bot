@@ -112,7 +112,7 @@ int main(int argc, char* argv[]) {
         CreateComputer(
             sc2::Race::Random,
             sc2::Difficulty::VeryHard,
-            sc2::AIBuild::Rush,
+            sc2::AIBuild::RandomBuild,
             "VeryHard"
         )
     });

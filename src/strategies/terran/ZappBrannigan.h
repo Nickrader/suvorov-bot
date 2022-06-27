@@ -17,7 +17,11 @@ struct Killbots : Strategy {
 
     void OnUnitCreated(const sc2::Unit*, Builder*);
 
+    void OnUnitDestroyed(const sc2::Unit*, Builder*) final;
+
     //void OnUnitEnterVision(const sc2::Unit*, Builder*);
+
+
 
 private:
     bool Should_Build_Expansion();
@@ -26,7 +30,3 @@ private:
     int number_of_townhalls = 1; // we start with one command center.
     int number_of_barracks = 0; 
 };
-
-// TODO: set rally point when Barracks is started?constructed?Idle?
-//  Obviously, when it gets called will be important, but for now,
-//  just want to 
