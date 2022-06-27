@@ -48,8 +48,6 @@ void Killbots::OnUnitIdle(const sc2::Unit* unit_, Builder* builder_) {
   }
 }
 
-// But we don't execute Attack() reaching attack_limit
-
 void Killbots::OnUnitCreated(const sc2::Unit* unit_, Builder* builder_) {
   const Expansions& expansions = gHub->GetExpansions();
   sc2::Point3D natural_expansion = expansions[1].town_hall_location;  // test
@@ -61,6 +59,7 @@ void Killbots::OnUnitCreated(const sc2::Unit* unit_, Builder* builder_) {
       units_.push_back(unit_);
       gAPI->action().Attack(units_, rally);
   }
+  Strategy::OnUnitCreated(unit_, builder_); // should I be intializing this differently?  This seems the way. 
 }
 
 bool Killbots::Should_Build_Expansion() {
