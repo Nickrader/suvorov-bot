@@ -3,7 +3,6 @@
 Knowing their weakness, I sent wave after wave of my own men at them, until they
 reached their limit, and shutdown." -Captain Zapp Brannigan */
 
-#include "Builder.h"
 #include "strategies/Strategy.h"
 
 struct Killbots : Strategy {
@@ -28,5 +27,6 @@ private:
     bool to_build_or_not_to_build = false;
 
     int number_of_townhalls = 1; // we start with one command center.
-    int number_of_barracks = 0; 
+    int number_of_barracks = 0;
+    int number_of_supplydepots = 0;
 };
