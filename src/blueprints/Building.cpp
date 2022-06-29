@@ -3,22 +3,30 @@
 // Copyright (c) 2017-2022 Alexander Kurbatov
 
 #include "Building.h"
+
 #include "Hub.h"
 #include "core/API.h"
 
 bool Building::Build(Order* order_) {
-    // Find place to build the structure
-    sc2::Point3D base = gAPI->observer().StartingLocation();
-    sc2::Point2D point;
+  // Find place to build the structure
+  sc2::Point3D base = gAPI->observer().StartingLocation();
+  sc2::Point2D point;
 
-    unsigned attempt = 0;
-    do {
-        point.x = base.x + sc2::GetRandomScalar() * 15.0f;
-        point.y = base.y + sc2::GetRandomScalar() * 15.0f;
+  unsigned attempt = 0;
+  do {
+    point.x = base.x + sc2::GetRandomScalar() * 15.0f;
+    point.y = base.y + sc2::GetRandomScalar() * 15.0f;
 
-        if (++attempt > 150)
-            return false;
-    } while (!gAPI->query().CanBePlaced(*order_, point));
+    if (++attempt > 150) {
+      do {
+        point.x = base.x + sc2::GetRandomScalar() * 45.0f;
+        point.y = base.y + sc2::GetRandomScalar() * 45.0f;
 
-    return gHub->AssignBuildTask(order_, point);
+        if (++attempt > 150) return false;
+      } while (!gAPI->query().CanBePlaced(*order_, point));
+    }
+    // return false;
+  } while (!gAPI->query().CanBePlaced(*order_, point));
+
+  return gHub->AssignBuildTask(order_, point);
 }
