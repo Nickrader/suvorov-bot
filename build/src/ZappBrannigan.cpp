@@ -1,10 +1,10 @@
 #include "strategies/terran/ZappBrannigan.h"
 
+#include <sc2api/sc2_map_info.h>
+
 #include "Historican.h"
 #include "Hub.h"
-//#include "core/API.cpp"  // why does this fix type error, incomoplete class type??? for gAPI...Creates ungodly amt of linker errors, tho.
 #include "core/API.h"
-#include <sc2api/sc2_map_info.h>
 
 // I do have problem that 2nd supply depot may be built early (far from
 // optimal), because we only count completed structures, unless we implement a
@@ -30,7 +30,7 @@ my strategy is so simple an idiot could have devised it."
             << std::endl;
 }
 
-void Killbots::OnStep(Builder* builder_) {
+void Killbots::OnStep(Builder* builder_) { //  I have made spaghetti, but will live with for now.  Just need to get ideas out and mash buttuns.
   uint32_t minerals = gAPI->observer().GetMinerals();
   to_build_or_not_to_build = Should_Build_Expansion();
 
@@ -41,16 +41,18 @@ void Killbots::OnStep(Builder* builder_) {
     }
   }
 
-  if (!to_build_or_not_to_build)
+  //if (!to_build_or_not_to_build)  // do I need this check?  It makes us build no more rax after 'n' in switch statement.
+    // yes I do need some sort of flow control or my minerals will never get above 150 as machine never misses a click.
     if (minerals >= 150) {
       builder_->ScheduleObligatoryOrder(sc2::UNIT_TYPEID::TERRAN_BARRACKS);
       ++number_of_barracks;
     }
 
   Strategy::OnStep(builder_);
+
   if (gAPI->observer().GetFoodUsed() == 200) {
-     auto targets = gAPI->observer().GameInfo().enemy_start_locations;
-    gAPI->action().Attack(m_units, targets.front());
+    auto targets = gAPI->observer().GameInfo().enemy_start_locations;
+    gAPI->action().Attack(m_units, targets.front());  // when enemy main dies, this spams a point not all ordered can occupy and game seems to slow down, b/c of this???
   }
 }
 
@@ -98,19 +100,19 @@ void Killbots::OnUnitDestroyed(const sc2::Unit* unit_, Builder* builder_) {
 bool Killbots::Should_Build_Expansion() {
   switch (number_of_townhalls) {
     case 1:
-      if (number_of_barracks >= 3)
+      if (number_of_barracks >= 1)
         return true;
       else
         return false;
       break;
     case 2:
-      if (number_of_barracks >= 7)
+      if (number_of_barracks >= 4)
         return true;
       else
         return false;
       break;
     case 3:
-      if (number_of_barracks >= 11)
+      if (number_of_barracks >= 7)
         return true;
       else
         return false;
