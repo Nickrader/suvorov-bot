@@ -9,7 +9,7 @@
 
 #include <sc2api/sc2_map_info.h>
 
-#include <algorithm> //seems msvc uses it's own version called xmemory
+#include <algorithm>
 
 namespace {
 Historican gHistory("strategy");

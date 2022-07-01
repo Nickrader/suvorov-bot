@@ -137,7 +137,7 @@ void QuarterMaster::OnStep(Builder* builder_) {
     if (expected_supply > expected_consumption || expected_supply >= 200.0f)
         return;
 
-    gHistory.info() << "Request additional supplies: " <<
+    gHistory.info() << "Request additional supplies: " << // called once at 15, but get 2 depots, why?
         expected_consumption << " >= " << expected_supply << '\n';
 
     m_skip_until_frame = gAPI->observer().GetGameLoop() + m_frames_to_skip;

@@ -6,16 +6,6 @@
 #include "Hub.h"
 #include "core/API.h"
 
-// when supply hits 200; marines added to front of queue are never built, should
-// dump the orders list to std::output when minerals climb.  See if rax on the books???
-
-// I do have problem that 2nd supply depot may be built early (far from
-// optimal) need to find out where in logic of game it
-// makes depots.
-//   start at builder, dispatcher, the usual suspects.
-//  I am not adding them to 'ObligatoryOrder' so not as simple as counting
-// in my functions.
-
 namespace {
 Historican gHistory("strategy.ZappBrannigan");
 }  // namespace
@@ -28,32 +18,47 @@ my strategy is so simple an idiot could have devised it."
             << std::endl;
 }
 
-void Killbots::OnStep(Builder* builder_) {  // FIXME: consolidate/ refactor
+void Killbots::OnStep(
+    Builder* builder_) {  // FIXME(nickrader): consolidate/ refactor
+  Strategy::OnStep(builder_);
   uint32_t minerals = gAPI->observer().GetMinerals();
-  to_build_or_not_to_build =
+  to_build =
       Should_Build_Expansion();  //  probably a better way to control flow, this
                                  //  is very simple implementatoin.
 
-  if (to_build_or_not_to_build) {
+  if (to_build) {
     if (minerals >= 400) {
-      builder_->ScheduleObligatoryOrder(sc2::UNIT_TYPEID::TERRAN_COMMANDCENTER);
+      if (gAPI->observer().GetAvailableFood() >= 198) {
+        builder_->ScheduleObligatoryOrder(
+            sc2::UNIT_TYPEID::TERRAN_COMMANDCENTER, true);
+      } else {
+        builder_->ScheduleObligatoryOrder(
+            sc2::UNIT_TYPEID::TERRAN_COMMANDCENTER);
+      }
       ++number_of_townhalls;
     }
   }
+  // getting extra depot because it is scheduling tech_requirement, the one
+  // building doesn't show in logic check of builder.cpp
+  if (!to_build) {
+    //// tells me if has orders, doesn't affect tech_requirements though.
+    // if (gAPI->observer().GetUnits().HasOrder(
+    //        sc2::ABILITY_ID::BUILD_SUPPLYDEPOT))
 
-  if (!to_build_or_not_to_build)
-    if (minerals >= 150) {
-      builder_->ScheduleObligatoryOrder(sc2::UNIT_TYPEID::TERRAN_BARRACKS);
-      ++number_of_barracks;
-    }
-
-  Strategy::OnStep(builder_);
-
-  // this does not fix issue, as there are lots of without orders after destroy
-  // main. may not be full cause of issue, but seems to contribute. so I need
-  // condition if
+    // Winning?
+    if (gAPI->observer().CountUnitType(sc2::UNIT_TYPEID::TERRAN_SUPPLYDEPOT) >
+        0)
+      if (minerals >= 150) {
+        builder_->ScheduleObligatoryOrder(sc2::UNIT_TYPEID::TERRAN_BARRACKS,
+                                          true);
+        ++number_of_barracks;
+      }
+  }
+  // this does not fix lag issue, as there are lots of without orders after
+  // destroy main. may not be full cause of issue, but seems to contribute. so I
+  // need condition if main destroyed.
   if (gAPI->observer().GetFoodUsed() == 200) {
-    auto targets = gAPI->observer().GameInfo().enemy_start_locations;
+    auto& targets = gAPI->observer().GameInfo().enemy_start_locations;
     for (auto i : m_units) {
       if (i->orders.empty()) {
         gAPI->action().Attack(m_units, targets.front());
@@ -102,6 +107,8 @@ void Killbots::OnUnitDestroyed(const sc2::Unit* unit_, Builder* builder_) {
       break;
   }
 }
+
+void Killbots::OnGameEnd() {}
 
 bool Killbots::Should_Build_Expansion() {
   switch (number_of_townhalls) {
