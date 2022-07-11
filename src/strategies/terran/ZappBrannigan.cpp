@@ -38,14 +38,8 @@ void Killbots::OnStep(
       ++number_of_townhalls;
     }
   }
-  // getting extra depot because it is scheduling tech_requirement, the one
-  // building doesn't show in logic check of builder.cpp
-  if (!to_build) {
-    //// tells me if has orders, doesn't affect tech_requirements though.
-    // if (gAPI->observer().GetUnits().HasOrder(
-    //        sc2::ABILITY_ID::BUILD_SUPPLYDEPOT))
 
-    // Winning?
+  if (!to_build) {
     if (gAPI->observer().CountUnitType(sc2::UNIT_TYPEID::TERRAN_SUPPLYDEPOT) >
         0)
       if (minerals >= 150) {
@@ -54,9 +48,8 @@ void Killbots::OnStep(
         ++number_of_barracks;
       }
   }
-  // this does not fix lag issue, as there are lots of without orders after
-  // destroy main. may not be full cause of issue, but seems to contribute. so I
-  // need condition if main destroyed.
+// FIXME(nickrader): possible cause of extra lag issues at max army supply?
+  // lag more pronounced in Debug rather than Release compilation.
   if (gAPI->observer().GetFoodUsed() == 200) {
     auto& targets = gAPI->observer().GameInfo().enemy_start_locations;
     for (auto i : m_units) {
