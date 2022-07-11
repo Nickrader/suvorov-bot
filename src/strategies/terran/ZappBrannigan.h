@@ -18,7 +18,7 @@ struct Killbots : Strategy {
 
     void OnUnitDestroyed(const sc2::Unit*, Builder*) final;
 
-    //void OnUnitEnterVision(const sc2::Unit*, Builder*);
+    void OnUnitEnterVision(const sc2::Unit*, Builder*) final;
     
     void OnGameEnd() final;
 

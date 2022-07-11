@@ -48,9 +48,9 @@ void Killbots::OnStep(
         ++number_of_barracks;
       }
   }
-// FIXME(nickrader): possible cause of extra lag issues at max army supply?
+  // FIXME(nickrader): possible cause of extra lag issues at max army supply?
   // lag more pronounced in Debug rather than Release compilation.
-  //if (gAPI->observer().GetFoodUsed() == 200) {
+  // if (gAPI->observer().GetFoodUsed() == 200) {
   //  auto& targets = gAPI->observer().GameInfo().enemy_start_locations;
   //  for (auto i : m_units) {
   //    if (i->orders.empty()) {
@@ -100,6 +100,8 @@ void Killbots::OnUnitDestroyed(const sc2::Unit* unit_, Builder* builder_) {
       break;
   }
 }
+
+void Killbots::OnUnitEnterVision(const sc2::Unit* unit_, Builder* builder_) {}
 
 void Killbots::OnGameEnd() {}
 
