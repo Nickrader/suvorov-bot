@@ -35,7 +35,7 @@ void Strategy::OnStep(Builder*) {
     gAPI->action().Attack(m_units, targets.front());
 
     m_units.clear();
-    m_attack_limit = std::min<float>(m_attack_limit * 1.5f, 170.0f);
+    m_attack_limit = std::min<float>(m_attack_limit * 1.5f, 100.0f);
 }
 
 void Strategy::OnUnitCreated(const sc2::Unit* unit_, Builder*) {
