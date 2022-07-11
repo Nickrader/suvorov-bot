@@ -18,17 +18,16 @@ my strategy is so simple an idiot could have devised it."
             << std::endl;
 }
 
-void Killbots::OnStep(
-    Builder* builder_) {  // FIXME(nickrader): consolidate/ refactor
+// FIXME(nickrader): consolidate/ refactor
+void Killbots::OnStep(Builder* builder_) {
   Strategy::OnStep(builder_);
   uint32_t minerals = gAPI->observer().GetMinerals();
-  to_build =
-      Should_Build_Expansion();  //  probably a better way to control flow, this
-                                 //  is very simple implementatoin.
+  //  probably a better way to control flow, this is very simple implementatoin.
+  to_build = Should_Build_Expansion();
 
   if (to_build) {
     if (minerals >= 400) {
-      if (gAPI->observer().GetAvailableFood() >= 198) {
+      if (gAPI->observer().GetFoodUsed() >= 190) {
         builder_->ScheduleObligatoryOrder(
             sc2::UNIT_TYPEID::TERRAN_COMMANDCENTER, true);
       } else {
@@ -63,7 +62,7 @@ void Killbots::OnStep(
 void Killbots::OnUnitIdle(const sc2::Unit* unit_, Builder* builder_) {
   switch (unit_->unit_type.ToType()) {
     case sc2::UNIT_TYPEID::TERRAN_BARRACKS:
-      builder_->ScheduleObligatoryOrder(sc2::UNIT_TYPEID::TERRAN_MARINE, unit_);
+      builder_->ScheduleObligatoryOrder(sc2::UNIT_TYPEID::TERRAN_MARINE);
       gHistory.info() << "Schedule Marine training\n";
       break;
     default:
