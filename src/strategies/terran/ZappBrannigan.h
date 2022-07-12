@@ -12,6 +12,8 @@ struct Killbots : Strategy {
 
     void OnStep(Builder*) final;
 
+    void build_commandcenter(Builder* builder_);
+
     void OnUnitIdle(const sc2::Unit*, Builder*) final;
 
     void OnUnitCreated(const sc2::Unit*, Builder*);

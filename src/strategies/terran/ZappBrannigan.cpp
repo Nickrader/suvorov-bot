@@ -26,16 +26,7 @@ void Killbots::OnStep(Builder* builder_) {
   to_build = Should_Build_Expansion();
 
   if (to_build) {
-    if (minerals >= 400) {
-      if (gAPI->observer().GetFoodUsed() >= 190) {
-        builder_->ScheduleObligatoryOrder(
-            sc2::UNIT_TYPEID::TERRAN_COMMANDCENTER, true);
-      } else {
-        builder_->ScheduleObligatoryOrder(
-            sc2::UNIT_TYPEID::TERRAN_COMMANDCENTER);
-      }
-      ++number_of_townhalls;
-    }
+    if (minerals >= 400) build_commandcenter(builder_);
   }
 
   if (!to_build) {
@@ -158,4 +149,16 @@ bool Killbots::Should_Build_Expansion() {
       return true;  // true covers case max CC
       break;
   }
+}
+void Killbots::build_commandcenter(Builder* builder_) {
+    {
+        if (gAPI->observer().GetFoodUsed() >= 190) {
+            builder_->ScheduleObligatoryOrder(sc2::UNIT_TYPEID::TERRAN_COMMANDCENTER,
+                true);
+        }
+        else {
+            builder_->ScheduleObligatoryOrder(sc2::UNIT_TYPEID::TERRAN_COMMANDCENTER);
+        }
+        ++number_of_townhalls;
+    }
 }
