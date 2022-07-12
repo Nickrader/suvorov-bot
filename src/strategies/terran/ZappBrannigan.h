@@ -12,7 +12,9 @@ struct Killbots : Strategy {
 
     void OnStep(Builder*) final;
 
-    void build_commandcenter(Builder* builder_);
+    void build_barracks(const uint32_t& minerals, Builder* builder_);
+
+    void build_commandcenter(const uint32_t& minerals, Builder* builder_);
 
     void OnUnitIdle(const sc2::Unit*, Builder*) final;
 
@@ -27,7 +29,7 @@ struct Killbots : Strategy {
 
 private:
     bool Should_Build_Expansion();
-    bool to_build = false;
+    bool build_cc = false;
 
     int number_of_townhalls = 1; // we start with one command center.
     int number_of_barracks = 0;

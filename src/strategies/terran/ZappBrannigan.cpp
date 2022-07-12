@@ -21,23 +21,15 @@ my strategy is so simple an idiot could have devised it."
 // FIXME(nickrader): consolidate/ refactor
 void Killbots::OnStep(Builder* builder_) {
   Strategy::OnStep(builder_);
+  // want minerals to update on step?  Or some more delay?
   uint32_t minerals = gAPI->observer().GetMinerals();
   //  probably a better way to control flow, this is very simple implementatoin.
-  to_build = Should_Build_Expansion();
+  build_cc = Should_Build_Expansion();
 
-  if (to_build) {
-    if (minerals >= 400) build_commandcenter(builder_);
-  }
+  if (build_cc) build_commandcenter(minerals, builder_);
 
-  if (!to_build) {
-    if (gAPI->observer().CountUnitType(sc2::UNIT_TYPEID::TERRAN_SUPPLYDEPOT) >
-        0)
-      if (minerals >= 150) {
-        builder_->ScheduleObligatoryOrder(sc2::UNIT_TYPEID::TERRAN_BARRACKS,
-                                          true);
-        ++number_of_barracks;
-      }
-  }
+  if (!build_cc) build_barracks(minerals, builder_);
+
   // FIXME(nickrader): possible cause of extra lag issues at max army supply?
   // lag more pronounced in Debug rather than Release compilation.
   // if (gAPI->observer().GetFoodUsed() == 200) {
@@ -66,17 +58,18 @@ void Killbots::OnUnitCreated(const sc2::Unit* unit_, Builder* builder_) {
   sc2::Point3D natural_expansion =
       expansions[1].town_hall_location;  // works at [0] not [1] for realtime.
   sc2::Point2D rally(natural_expansion.x, natural_expansion.y);
-  sc2::Units units_{};
+  // converst sc2::Unit to sc2::Units b/c that is what Attack takes as arg
+  sc2::Units units{};
 
   switch (unit_->unit_type.ToType()) {
     case sc2::UNIT_TYPEID::TERRAN_MARINE:
-      units_.push_back(unit_);
+      units.push_back(unit_);
       break;
     default:
       break;
   }
 
-  gAPI->action().Attack(units_, rally);
+  gAPI->action().Attack(units, rally);
   Strategy::OnUnitCreated(unit_, builder_);
 }
 
@@ -91,9 +84,14 @@ void Killbots::OnUnitDestroyed(const sc2::Unit* unit_, Builder* builder_) {
   }
 }
 
-void Killbots::OnUnitEnterVision(const sc2::Unit* unit_, Builder* builder_) {}
+void Killbots::OnUnitEnterVision(const sc2::Unit* unit_, Builder* builder_) {
+    gHub->
+}
 
-void Killbots::OnGameEnd() {}
+void Killbots::OnGameEnd() {
+  std::cout << "\nEnd Game:\n Barracks: " << number_of_barracks
+            << "\n TownHalls: " << number_of_townhalls << std::endl;
+}
 
 bool Killbots::Should_Build_Expansion() {
   switch (number_of_townhalls) {
@@ -150,15 +148,27 @@ bool Killbots::Should_Build_Expansion() {
       break;
   }
 }
-void Killbots::build_commandcenter(Builder* builder_) {
-    {
-        if (gAPI->observer().GetFoodUsed() >= 190) {
-            builder_->ScheduleObligatoryOrder(sc2::UNIT_TYPEID::TERRAN_COMMANDCENTER,
-                true);
-        }
-        else {
-            builder_->ScheduleObligatoryOrder(sc2::UNIT_TYPEID::TERRAN_COMMANDCENTER);
-        }
-        ++number_of_townhalls;
+void Killbots::build_commandcenter(const uint32_t& minerals,
+                                   Builder* builder_) {
+  if (minerals >= 400) {
+    // not sure best supply to make urgent, try max (200) for now.
+    if (gAPI->observer().GetFoodUsed() >= 200) {
+      builder_->ScheduleObligatoryOrder(sc2::UNIT_TYPEID::TERRAN_COMMANDCENTER,
+                                        true);
+    } else {
+      builder_->ScheduleObligatoryOrder(sc2::UNIT_TYPEID::TERRAN_COMMANDCENTER);
     }
+    ++number_of_townhalls;
+  }
+}
+void Killbots::build_barracks(const uint32_t& minerals, Builder* builder_) {
+  {
+    if (gAPI->observer().CountUnitType(sc2::UNIT_TYPEID::TERRAN_SUPPLYDEPOT) >
+        0)
+      if (minerals >= 150) {
+        builder_->ScheduleObligatoryOrder(sc2::UNIT_TYPEID::TERRAN_BARRACKS,
+                                          true);
+        ++number_of_barracks;
+      }
+  }
 }
