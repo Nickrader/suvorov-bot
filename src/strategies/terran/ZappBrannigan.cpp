@@ -24,6 +24,7 @@ void Killbots::OnStep(Builder* builder_) {
   Strategy::OnStep(builder_);
   // want minerals to update on step?  Or some more delay?
   uint32_t minerals = gAPI->observer().GetMinerals();
+  auto& targets = gAPI->observer().GameInfo().enemy_start_locations;
   //  probably a better way to control flow, this is very simple implementatoin.
   build_cc = Should_Build_Expansion();
 
@@ -31,6 +32,24 @@ void Killbots::OnStep(Builder* builder_) {
 
   if (!build_cc) build_barracks(minerals, builder_);
 
+  // how do I? identify if target.front() is destoryed?
+  // ? it is a point2D, compare with buildings_enemy vector??
+  // if townhall is destroyed at target.front()
+  for (auto it = buildings_enemy.begin(); it != buildings_enemy.end(); ++it) {
+    auto g_unit = *it;
+    sc2::Point2D& g_unit_loc = {g_unit->pos.x, g_unit->pos.y};
+    if (targets.front() == g_unit_loc)
+      break;
+    if
+      gAPI->action().Attack(buildings_enemy, g_unit_loc);
+  }
+  // hold up, this isn't going to work as expected.  Will trigger attack   
+
+  // then attack targets_enemy[0]
+  // when building destroyed
+  // attack next targets_enemy[i]
+
+  // should be a funtion, but is there better way to control flow????
   // FIXME(nickrader): possible cause of extra lag issues at max army supply?
   // lag more pronounced in Debug rather than Release compilation.
   // if (gAPI->observer().GetFoodUsed() == 200) {
@@ -82,17 +101,34 @@ void Killbots::OnUnitDestroyed(const sc2::Unit* unit_, Builder* builder_) {
     case sc2::UNIT_TYPEID::TERRAN_BARRACKS:
       --number_of_barracks;
       break;
+    default:
+      break;
+  }
+  if (unit_->Enemy && sc2::IsBuilding()(unit_->unit_type)) {
+    for (auto it = buildings_enemy.begin(); it != buildings_enemy.end(); ++it) {
+      if (unit_ == *it) buildings_enemy.erase(it);
+    }
   }
 }
 
 void Killbots::OnUnitEnterVision(const sc2::Unit* unit_, Builder* builder_) {
-    if ((unit_->Alliance::Enemy) && unit_->unit_type.ToType(sc2::IsBuilding))
-        ;
+  if (unit_->Alliance::Enemy && sc2::IsBuilding()(unit_->unit_type))
+    buildings_enemy.push_back(unit_);
 }
 
 void Killbots::OnGameEnd() {
+  sc2::Point2D& target = {
+      gAPI->observer().GameInfo().enemy_start_locations[0].x,
+      gAPI->observer().GameInfo().enemy_start_locations[0].y};
   std::cout << "\nEnd Game:\n Barracks: " << number_of_barracks
-            << "\n TownHalls: " << number_of_townhalls << std::endl;
+            << "\nTownHalls: " << number_of_townhalls << std::endl;
+  std::cout << "\nNumTargets: " << buildings_enemy.size() << std::endl;
+  std::cout << "\nTargetsFront(): " << target.x << " , " << target.y
+            << std::endl;
+  for (auto i : buildings_enemy) {
+    std::cout << "\n Target: " << i->pos.x << " , " << i->pos.y
+              << "\n\tLast Seen: " << i->last_seen_game_loop << std::endl;
+  }
 }
 
 bool Killbots::Should_Build_Expansion() {
