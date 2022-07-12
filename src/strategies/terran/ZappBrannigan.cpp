@@ -1,6 +1,7 @@
 #include "strategies/terran/ZappBrannigan.h"
 
 #include <sc2api/sc2_map_info.h>
+#include <sc2api/sc2_unit_filters.h>
 
 #include "Historican.h"
 #include "Hub.h"
@@ -85,7 +86,8 @@ void Killbots::OnUnitDestroyed(const sc2::Unit* unit_, Builder* builder_) {
 }
 
 void Killbots::OnUnitEnterVision(const sc2::Unit* unit_, Builder* builder_) {
-    gHub->
+    if ((unit_->Alliance::Enemy) && unit_->unit_type.ToType(sc2::IsBuilding))
+        ;
 }
 
 void Killbots::OnGameEnd() {
