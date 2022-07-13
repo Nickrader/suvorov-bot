@@ -32,22 +32,20 @@ void Killbots::OnStep(Builder* builder_) {
 
   if (!build_cc) build_barracks(minerals, builder_);
 
-  // how do I? identify if target.front() is destoryed?
-  // ? it is a point2D, compare with buildings_enemy vector??
-  // if townhall is destroyed at target.front()
   for (auto it = buildings_enemy.begin(); it != buildings_enemy.end(); ++it) {
     auto g_unit = *it;
-    sc2::Point2D& g_unit_loc = {g_unit->pos.x, g_unit->pos.y};
-    if (targets.front() == g_unit_loc)
+    sc2::Point2D g_unit_loc{g_unit->pos.x, g_unit->pos.y};
+    if (g_unit_loc == targets.front()) {
+      std::cout << "Yahtze!" << std::endl;
       break;
-    if
-      gAPI->action().Attack(buildings_enemy, g_unit_loc);
+    }
+    if (it == buildings_enemy.end()) {
+      gAPI->action().Attack(
+          m_units, {buildings_enemy[0]->pos.x, buildings_enemy[0]->pos.y});
+    }
   }
-  // hold up, this isn't going to work as expected.  Will trigger attack   
-
-  // then attack targets_enemy[0]
-  // when building destroyed
-  // attack next targets_enemy[i]
+  // as building destroyed, should update buildings_enemy (I hope, lol)
+  // well it was a good hope.
 
   // should be a funtion, but is there better way to control flow????
   // FIXME(nickrader): possible cause of extra lag issues at max army supply?
@@ -104,11 +102,14 @@ void Killbots::OnUnitDestroyed(const sc2::Unit* unit_, Builder* builder_) {
     default:
       break;
   }
-  if (unit_->Enemy && sc2::IsBuilding()(unit_->unit_type)) {
-    for (auto it = buildings_enemy.begin(); it != buildings_enemy.end(); ++it) {
-      if (unit_ == *it) buildings_enemy.erase(it);
+
+  if (unit_->alliance == sc2::Unit::Alliance::Enemy) // This is now not triggering at all
+    if (sc2::IsBuilding()(unit_->unit_type)) {
+      for (auto it = buildings_enemy.begin(); it != buildings_enemy.end();
+           ++it) {
+        if (unit_ == *it) buildings_enemy.erase(it);
+      }
     }
-  }
 }
 
 void Killbots::OnUnitEnterVision(const sc2::Unit* unit_, Builder* builder_) {
@@ -117,9 +118,8 @@ void Killbots::OnUnitEnterVision(const sc2::Unit* unit_, Builder* builder_) {
 }
 
 void Killbots::OnGameEnd() {
-  sc2::Point2D& target = {
-      gAPI->observer().GameInfo().enemy_start_locations[0].x,
-      gAPI->observer().GameInfo().enemy_start_locations[0].y};
+  sc2::Point2D target{gAPI->observer().GameInfo().enemy_start_locations[0].x,
+                      gAPI->observer().GameInfo().enemy_start_locations[0].y};
   std::cout << "\nEnd Game:\n Barracks: " << number_of_barracks
             << "\nTownHalls: " << number_of_townhalls << std::endl;
   std::cout << "\nNumTargets: " << buildings_enemy.size() << std::endl;
