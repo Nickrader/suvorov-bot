@@ -98,7 +98,7 @@ void Killbots::OnUnitDestroyed(const sc2::Unit* unit_,
       for (auto it = buildings_enemy.begin(); it != buildings_enemy.end();
            ++it) {
         if (unit_ == *it) {
-            test_targeting(it);
+          test_targeting(it);
           buildings_enemy.erase(it);
           break;
         }
@@ -125,22 +125,21 @@ void Killbots::OnGameEnd() {
   }
 }
 
-void Killbots::test_targeting(sc2::Units::iterator it) {
-    auto& targets = gAPI->observer().GameInfo().enemy_start_locations;
-    for (auto it = buildings_enemy.begin(); it != buildings_enemy.end(); ++it) {
-        auto it_loc = *it;
-        sc2::Point2D unit_it_loc{ it_loc->pos.x, it_loc->pos.y };
-        if (unit_it_loc == targets.front()) {
-            std::cout << "Yahtze!" << std::endl;  // this is triggering still after
-                                                  // enemy_main is destroyed.
-                                                  // Ugghhhh... break;
-        }
-        if (it == buildings_enemy.end()) {
-            gAPI->action().Attack(
-                m_units, { buildings_enemy[0]->pos.x, buildings_enemy[0]->pos.y });
-        }
-    }
+void Killbots::test_targeting(sc2::Units::iterator iter) {
+  auto& targets = gAPI->observer().GameInfo().enemy_start_locations;
+  // for (auto it = buildings_enemy.begin(); it != buildings_enemy.end(); ++it)
+  // {
+  auto& it_loc = *iter;
+  sc2::Point2D unit_it_loc{it_loc->pos.x, it_loc->pos.y};
+  if (unit_it_loc == targets.front()) {
+    std::cout << "Yahtze!" << std::endl;  // worked as intented.
+  }
+  //if (it == buildings_enemy.end()) {
+  //  gAPI->action().Attack(
+  //      m_units, {buildings_enemy[0]->pos.x, buildings_enemy[0]->pos.y});
+  //}
 }
+
 bool Killbots::Should_Build_Expansion() {
   switch (number_of_townhalls) {
     case 1:
