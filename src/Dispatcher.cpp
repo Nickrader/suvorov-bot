@@ -133,8 +133,8 @@ void Dispatcher::OnUnitDamaged(const sc2::Unit* unit_, float health_, float shie
 }
 
 void Dispatcher::OnUnitDestroyed(const sc2::Unit* unit_) {
-    if (unit_->alliance != sc2::Unit::Alliance::Self)
-        return;
+    //if (unit_->alliance != sc2::Unit::Alliance::Self)
+    //    return;
 
     gHistory.info() << sc2::UnitTypeToName(unit_->unit_type) <<
          "(" << unit_->tag << ") was destroyed\n";

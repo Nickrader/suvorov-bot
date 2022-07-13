@@ -36,7 +36,7 @@ void Killbots::OnStep(Builder* builder_) {
     auto g_unit = *it;
     sc2::Point2D g_unit_loc{g_unit->pos.x, g_unit->pos.y};
     if (g_unit_loc == targets.front()) {
-      std::cout << "Yahtze!" << std::endl;
+      std::cout << "Yahtze!" << std::endl; // this is triggering still after enemy_main is destroyed.  Ugghhhh...
       break;
     }
     if (it == buildings_enemy.end()) {
@@ -44,8 +44,6 @@ void Killbots::OnStep(Builder* builder_) {
           m_units, {buildings_enemy[0]->pos.x, buildings_enemy[0]->pos.y});
     }
   }
-  // as building destroyed, should update buildings_enemy (I hope, lol)
-  // well it was a good hope.
 
   // should be a funtion, but is there better way to control flow????
   // FIXME(nickrader): possible cause of extra lag issues at max army supply?
@@ -91,7 +89,6 @@ void Killbots::OnUnitCreated(const sc2::Unit* unit_, Builder* builder_) {
   Strategy::OnUnitCreated(unit_, builder_);
 }
 
-// does this only trigger on friendly units??? It seems so...
 void Killbots::OnUnitDestroyed(const sc2::Unit* unit_, Builder* builder_) { // breakpoint, investigate
   switch (unit_->unit_type.ToType()) {
     case sc2::UNIT_TYPEID::TERRAN_COMMANDCENTER:
@@ -103,12 +100,13 @@ void Killbots::OnUnitDestroyed(const sc2::Unit* unit_, Builder* builder_) { // b
     default:
       break;
   }
-  // only triggering on Self
+  // triggers on all units now, but runs much slower now.
   if (unit_->alliance == sc2::Unit::Alliance::Enemy)
     if (sc2::IsBuilding()(unit_->unit_type)) {
       for (auto it = buildings_enemy.begin(); it != buildings_enemy.end();
            ++it) {
-        if (unit_ == *it) buildings_enemy.erase(it);
+        if (unit_ == *it) buildings_enemy.erase(it); // null pointer exception after erasing only building in vector.
+        break;
       }
     }
 }
