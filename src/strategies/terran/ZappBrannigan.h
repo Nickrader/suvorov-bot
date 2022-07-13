@@ -12,7 +12,7 @@ struct Killbots : Strategy {
 
   void OnStep(Builder*) final;
 
-  void test_targeting(sc2::Units::iterator it);
+  void TestTargeting(sc2::Units::iterator it);
 
   void build_barracks(const uint32_t& minerals, Builder* builder_);
 
@@ -23,6 +23,8 @@ struct Killbots : Strategy {
   void OnUnitCreated(const sc2::Unit*, Builder*);
 
   void OnUnitDestroyed(const sc2::Unit*, Builder*) final;
+
+  void DestroyedEnemyBuildings(const sc2::Unit* unit_);
 
   void OnUnitEnterVision(const sc2::Unit*, Builder*) final;
 

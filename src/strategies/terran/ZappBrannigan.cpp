@@ -92,18 +92,8 @@ void Killbots::OnUnitDestroyed(const sc2::Unit* unit_,
     default:
       break;
   }
-  // triggers on all units now, but runs much slower now.
-  if (unit_->alliance == sc2::Unit::Alliance::Enemy)
-    if (sc2::IsBuilding()(unit_->unit_type)) {
-      for (auto it = buildings_enemy.begin(); it != buildings_enemy.end();
-           ++it) {
-        if (unit_ == *it) {
-          test_targeting(it);
-          buildings_enemy.erase(it);
-          break;
-        }
-      }
-    }
+
+  DestroyedEnemyBuildings(unit_);
 }
 
 void Killbots::OnUnitEnterVision(const sc2::Unit* unit_, Builder* builder_) {
@@ -125,21 +115,32 @@ void Killbots::OnGameEnd() {
   }
 }
 
-void Killbots::test_targeting(sc2::Units::iterator iter) {
+void Killbots::TestTargeting(sc2::Units::iterator iter) {
   auto& targets = gAPI->observer().GameInfo().enemy_start_locations;
-  // for (auto it = buildings_enemy.begin(); it != buildings_enemy.end(); ++it)
-  // {
   auto& it_loc = *iter;
   sc2::Point2D unit_it_loc{it_loc->pos.x, it_loc->pos.y};
   if (unit_it_loc == targets.front()) {
-    std::cout << "Yahtze!" << std::endl;  // worked as intented.
+    std::cout << "Yahtze!" << std::endl; // still triggers.
+    // breakpoint here to see value of m_units, didn't have all out attack of remaining buildings.
+    // probably better programmatic way to do this than watching the game till enemy main destroyed.
+    gAPI->action().Attack(
+        m_units, {buildings_enemy[0]->pos.x, buildings_enemy[0]->pos.y});
   }
-  //if (it == buildings_enemy.end()) {
-  //  gAPI->action().Attack(
-  //      m_units, {buildings_enemy[0]->pos.x, buildings_enemy[0]->pos.y});
-  //}
 }
 
+void Killbots::DestroyedEnemyBuildings(const sc2::Unit* unit_) {
+  if (unit_->alliance == sc2::Unit::Alliance::Enemy)
+    if (sc2::IsBuilding()(unit_->unit_type)) {
+      for (auto it = buildings_enemy.begin(); it != buildings_enemy.end();
+           ++it) {
+        if (unit_ == *it) {
+          TestTargeting(it);
+          buildings_enemy.erase(it);
+          break;
+        }
+      }
+    }
+}
 bool Killbots::Should_Build_Expansion() {
   switch (number_of_townhalls) {
     case 1:
