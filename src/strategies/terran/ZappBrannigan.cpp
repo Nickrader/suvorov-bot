@@ -91,7 +91,8 @@ void Killbots::OnUnitCreated(const sc2::Unit* unit_, Builder* builder_) {
   Strategy::OnUnitCreated(unit_, builder_);
 }
 
-void Killbots::OnUnitDestroyed(const sc2::Unit* unit_, Builder* builder_) {
+// does this only trigger on friendly units??? It seems so...
+void Killbots::OnUnitDestroyed(const sc2::Unit* unit_, Builder* builder_) { // breakpoint, investigate
   switch (unit_->unit_type.ToType()) {
     case sc2::UNIT_TYPEID::TERRAN_COMMANDCENTER:
       --number_of_townhalls;
@@ -102,8 +103,8 @@ void Killbots::OnUnitDestroyed(const sc2::Unit* unit_, Builder* builder_) {
     default:
       break;
   }
-
-  if (unit_->alliance == sc2::Unit::Alliance::Enemy) // This is now not triggering at all
+  // only triggering on Self
+  if (unit_->alliance == sc2::Unit::Alliance::Enemy)
     if (sc2::IsBuilding()(unit_->unit_type)) {
       for (auto it = buildings_enemy.begin(); it != buildings_enemy.end();
            ++it) {
