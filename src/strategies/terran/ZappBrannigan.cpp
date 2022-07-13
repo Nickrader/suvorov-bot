@@ -17,6 +17,10 @@ void Killbots::OnGameStart(Builder* builder_) {
   std::cout << "Now, like all great plans, \
 my strategy is so simple an idiot could have devised it."
             << std::endl;
+  std::cout << "\nEnemyStartLocations: "
+            << gAPI->observer().GameInfo().enemy_start_locations[0].x << ", "
+            << gAPI->observer().GameInfo().enemy_start_locations[0].y
+            << std::endl;
 }
 
 // FIXME(nickrader): consolidate/ refactor
@@ -24,26 +28,13 @@ void Killbots::OnStep(Builder* builder_) {
   Strategy::OnStep(builder_);
   // want minerals to update on step?  Or some more delay?
   uint32_t minerals = gAPI->observer().GetMinerals();
-  auto& targets = gAPI->observer().GameInfo().enemy_start_locations;
+
   //  probably a better way to control flow, this is very simple implementatoin.
   build_cc = Should_Build_Expansion();
 
   if (build_cc) build_commandcenter(minerals, builder_);
 
   if (!build_cc) build_barracks(minerals, builder_);
-
-  for (auto it = buildings_enemy.begin(); it != buildings_enemy.end(); ++it) {
-    auto g_unit = *it;
-    sc2::Point2D g_unit_loc{g_unit->pos.x, g_unit->pos.y};
-    if (g_unit_loc == targets.front()) {
-      std::cout << "Yahtze!" << std::endl; // this is triggering still after enemy_main is destroyed.  Ugghhhh...
-      break;
-    }
-    if (it == buildings_enemy.end()) {
-      gAPI->action().Attack(
-          m_units, {buildings_enemy[0]->pos.x, buildings_enemy[0]->pos.y});
-    }
-  }
 
   // should be a funtion, but is there better way to control flow????
   // FIXME(nickrader): possible cause of extra lag issues at max army supply?
@@ -89,7 +80,8 @@ void Killbots::OnUnitCreated(const sc2::Unit* unit_, Builder* builder_) {
   Strategy::OnUnitCreated(unit_, builder_);
 }
 
-void Killbots::OnUnitDestroyed(const sc2::Unit* unit_, Builder* builder_) { // breakpoint, investigate
+void Killbots::OnUnitDestroyed(const sc2::Unit* unit_,
+                               Builder* builder_) {  // breakpoint, investigate
   switch (unit_->unit_type.ToType()) {
     case sc2::UNIT_TYPEID::TERRAN_COMMANDCENTER:
       --number_of_townhalls;
@@ -105,8 +97,11 @@ void Killbots::OnUnitDestroyed(const sc2::Unit* unit_, Builder* builder_) { // b
     if (sc2::IsBuilding()(unit_->unit_type)) {
       for (auto it = buildings_enemy.begin(); it != buildings_enemy.end();
            ++it) {
-        if (unit_ == *it) buildings_enemy.erase(it); // null pointer exception after erasing only building in vector.
-        break;
+        if (unit_ == *it) {
+            test_targeting(it);
+          buildings_enemy.erase(it);
+          break;
+        }
       }
     }
 }
@@ -130,6 +125,22 @@ void Killbots::OnGameEnd() {
   }
 }
 
+void Killbots::test_targeting(sc2::Units::iterator it) {
+    auto& targets = gAPI->observer().GameInfo().enemy_start_locations;
+    for (auto it = buildings_enemy.begin(); it != buildings_enemy.end(); ++it) {
+        auto it_loc = *it;
+        sc2::Point2D unit_it_loc{ it_loc->pos.x, it_loc->pos.y };
+        if (unit_it_loc == targets.front()) {
+            std::cout << "Yahtze!" << std::endl;  // this is triggering still after
+                                                  // enemy_main is destroyed.
+                                                  // Ugghhhh... break;
+        }
+        if (it == buildings_enemy.end()) {
+            gAPI->action().Attack(
+                m_units, { buildings_enemy[0]->pos.x, buildings_enemy[0]->pos.y });
+        }
+    }
+}
 bool Killbots::Should_Build_Expansion() {
   switch (number_of_townhalls) {
     case 1:
