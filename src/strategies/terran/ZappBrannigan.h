@@ -38,4 +38,6 @@ struct Killbots : Strategy {
   int number_of_barracks = 0;
   int number_of_supplydepots = 0;
   sc2::Units buildings_enemy;
+
+  bool enemy_main_destroyed = false;
 };

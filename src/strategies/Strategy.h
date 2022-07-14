@@ -13,6 +13,8 @@ struct Strategy : Plugin {
 
     void OnUnitCreated(const sc2::Unit* unit_, Builder*) override;
 
+    void Strategy::CleanUpBodies(sc2::Units& units_); 
+
  protected:
     float m_attack_limit;
     sc2::Units m_units;

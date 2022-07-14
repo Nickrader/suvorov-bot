@@ -6,7 +6,8 @@
 #include "Historican.h"
 #include "Hub.h"
 #include "core/API.h"
-
+// TODO:  Setup Git for some auto-squashing, make cleaner commit history when I
+// merge to dev branch
 namespace {
 Historican gHistory("strategy.ZappBrannigan");
 }  // namespace
@@ -85,8 +86,13 @@ void Killbots::OnUnitDestroyed(const sc2::Unit* unit_,
 }
 
 void Killbots::OnUnitEnterVision(const sc2::Unit* unit_, Builder* builder_) {
-  if (unit_->Alliance::Enemy && sc2::IsBuilding()(unit_->unit_type))
+  // was I just missing some parantheses?  Yup, probably.
+  if (unit_->Alliance::Enemy && sc2::IsBuilding()(unit_->unit_type)) {
+    for (auto i : buildings_enemy) {
+      if (unit_ == i) return;
+    }
     buildings_enemy.push_back(unit_);
+  }
 }
 
 void Killbots::OnGameEnd() {
@@ -103,18 +109,24 @@ void Killbots::OnGameEnd() {
   }
 }
 
+// I think I can split this up into 2 functions.
+// should I?  Is it doing more than one thing?
 void Killbots::TestTargeting(sc2::Units::iterator iter) {
   auto& targets = gAPI->observer().GameInfo().enemy_start_locations;
   auto& it_loc = *iter;
   sc2::Point2D unit_it_loc{it_loc->pos.x, it_loc->pos.y};
   if (unit_it_loc == targets.front()) {
-
-    // breakpoint here to see value of m_units, didn't have all out attack of
-    // remaining buildings. probably better programmatic way to do this than
-    // watching the game till enemy main destroyed.
+    enemy_main_destroyed = true;
+  }
+  if (enemy_main_destroyed) {
+    // adds m_units to field_units only when something is destroyed. Other
+    // happens when attack_limit is reached.
+    for (auto i : m_units) field_units.push_back(i);
     gAPI->action().Attack(
-        field_units, {buildings_enemy[0]->pos.x,
-                  buildings_enemy[0]->pos.y});  
+        field_units, {buildings_enemy[0]->pos.x, buildings_enemy[0]->pos.y});
+
+    // TODO:
+    // buildings_enemy is not accurate and has duplicates.
   }
 }
 
@@ -125,12 +137,13 @@ void Killbots::DestroyedEnemyBuildings(const sc2::Unit* unit_) {
            ++it) {
         if (unit_ == *it) {
           TestTargeting(it);
-          buildings_enemy.erase(it);
+          buildings_enemy.erase(it);  // ? is this causing a problem?
           break;
         }
       }
     }
 }
+
 bool Killbots::Should_Build_Expansion() {
   switch (number_of_townhalls) {
     case 1:
@@ -186,9 +199,13 @@ bool Killbots::Should_Build_Expansion() {
       break;
   }
 }
+
 void Killbots::build_commandcenter(const uint32_t& minerals,
                                    Builder* builder_) {
   if (minerals >= 400) {
+    // just try arbitrary number to avoid thousands of CC build orders.
+    // TODO: make this expansions.size() test.
+    if (number_of_townhalls >= 20) return;
     // not sure best supply to make urgent, try max (200) for now.
     if (gAPI->observer().GetFoodUsed() >= 200) {
       builder_->ScheduleObligatoryOrder(sc2::UNIT_TYPEID::TERRAN_COMMANDCENTER,
@@ -199,6 +216,7 @@ void Killbots::build_commandcenter(const uint32_t& minerals,
     ++number_of_townhalls;
   }
 }
+
 void Killbots::build_barracks(const uint32_t& minerals, Builder* builder_) {
   {
     if (gAPI->observer().CountUnitType(sc2::UNIT_TYPEID::TERRAN_SUPPLYDEPOT) >
