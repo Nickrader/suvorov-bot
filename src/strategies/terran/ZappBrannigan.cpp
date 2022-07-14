@@ -35,18 +35,6 @@ void Killbots::OnStep(Builder* builder_) {
   if (build_cc) build_commandcenter(minerals, builder_);
 
   if (!build_cc) build_barracks(minerals, builder_);
-
-  // should be a funtion, but is there better way to control flow????
-  // FIXME(nickrader): possible cause of extra lag issues at max army supply?
-  // lag more pronounced in Debug rather than Release compilation.
-  // if (gAPI->observer().GetFoodUsed() == 200) {
-  //  auto& targets = gAPI->observer().GameInfo().enemy_start_locations;
-  //  for (auto i : m_units) {
-  //    if (i->orders.empty()) {
-  //      gAPI->action().Attack(m_units, targets.front());
-  //    }
-  //  }
-  //}
 }
 
 void Killbots::OnUnitIdle(const sc2::Unit* unit_, Builder* builder_) {
@@ -120,11 +108,14 @@ void Killbots::TestTargeting(sc2::Units::iterator iter) {
   auto& it_loc = *iter;
   sc2::Point2D unit_it_loc{it_loc->pos.x, it_loc->pos.y};
   if (unit_it_loc == targets.front()) {
-    std::cout << "Yahtze!" << std::endl; // still triggers.
-    // breakpoint here to see value of m_units, didn't have all out attack of remaining buildings.
-    // probably better programmatic way to do this than watching the game till enemy main destroyed.
+    std::cout << "Yahtze!" << std::endl;  // still triggers.
+    // breakpoint here to see value of m_units, didn't have all out attack of
+    // remaining buildings. probably better programmatic way to do this than
+    // watching the game till enemy main destroyed.
     gAPI->action().Attack(
-        m_units, {buildings_enemy[0]->pos.x, buildings_enemy[0]->pos.y});
+        m_units, {buildings_enemy[0]->pos.x,
+                  buildings_enemy[0]->pos.y});  // m_units is not all_army.
+    // m_units is just the newly created marines and those at rally.
   }
 }
 
@@ -220,3 +211,16 @@ void Killbots::build_barracks(const uint32_t& minerals, Builder* builder_) {
       }
   }
 }
+
+// Killbots::OnStep()
+// should be a funtion, but is there better way to control flow????
+// FIXME(nickrader): possible cause of extra lag issues at max army supply?
+// lag more pronounced in Debug rather than Release compilation.
+// if (gAPI->observer().GetFoodUsed() == 200) {
+//  auto& targets = gAPI->observer().GameInfo().enemy_start_locations;
+//  for (auto i : m_units) {
+//    if (i->orders.empty()) {
+//      gAPI->action().Attack(m_units, targets.front());
+//    }
+//  }
+//}
