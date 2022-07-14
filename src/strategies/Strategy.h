@@ -16,4 +16,5 @@ struct Strategy : Plugin {
  protected:
     float m_attack_limit;
     sc2::Units m_units;
+    sc2::Units field_units;
 };

@@ -108,7 +108,7 @@ void Killbots::TestTargeting(sc2::Units::iterator iter) {
   auto& it_loc = *iter;
   sc2::Point2D unit_it_loc{it_loc->pos.x, it_loc->pos.y};
   if (unit_it_loc == targets.front()) {
-    std::cout << "Yahtze!" << std::endl;  // still triggers.
+
     // breakpoint here to see value of m_units, didn't have all out attack of
     // remaining buildings. probably better programmatic way to do this than
     // watching the game till enemy main destroyed.
@@ -116,7 +116,7 @@ void Killbots::TestTargeting(sc2::Units::iterator iter) {
         m_units, {buildings_enemy[0]->pos.x,
                   buildings_enemy[0]->pos.y});  // m_units is not all_army.
     // m_units is just the newly created marines and those at rally.
-  }
+  }// investigate all references:  m_units.push_back() and m_units.erase()
 }
 
 void Killbots::DestroyedEnemyBuildings(const sc2::Unit* unit_) {

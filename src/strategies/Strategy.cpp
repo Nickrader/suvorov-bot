@@ -33,7 +33,8 @@ void Strategy::OnStep(Builder*) {
 
     auto targets = gAPI->observer().GameInfo().enemy_start_locations;
     gAPI->action().Attack(m_units, targets.front());
-
+    for (auto i : m_units) // clear may cause pointer problems?
+        field_units.push_back(i);
     m_units.clear();
     m_attack_limit = std::min<float>(m_attack_limit * 1.5f, 100.0f);
 }
