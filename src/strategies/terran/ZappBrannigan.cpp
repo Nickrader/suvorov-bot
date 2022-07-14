@@ -109,27 +109,6 @@ void Killbots::OnGameEnd() {
   }
 }
 
-// I think I can split this up into 2 functions.
-// should I?  Is it doing more than one thing?
-void Killbots::TestTargeting(sc2::Units::iterator iter) {
-  auto& targets = gAPI->observer().GameInfo().enemy_start_locations;
-  auto& it_loc = *iter;
-  sc2::Point2D unit_it_loc{it_loc->pos.x, it_loc->pos.y};
-  if (unit_it_loc == targets.front()) {
-    enemy_main_destroyed = true;
-  }
-  if (enemy_main_destroyed) {
-    // adds m_units to field_units only when something is destroyed. Other
-    // happens when attack_limit is reached.
-    for (auto i : m_units) field_units.push_back(i);
-    gAPI->action().Attack(
-        field_units, {buildings_enemy[0]->pos.x, buildings_enemy[0]->pos.y});
-
-    // TODO:
-    // buildings_enemy is not accurate and has duplicates.
-  }
-}
-
 void Killbots::DestroyedEnemyBuildings(const sc2::Unit* unit_) {
   if (unit_->alliance == sc2::Unit::Alliance::Enemy)
     if (sc2::IsBuilding()(unit_->unit_type)) {
@@ -142,6 +121,33 @@ void Killbots::DestroyedEnemyBuildings(const sc2::Unit* unit_) {
         }
       }
     }
+}
+
+// I think I can split this up into 2 functions.
+// should I?  Is it doing more than one thing?
+void Killbots::TestTargeting(sc2::Units::iterator iter) {
+  if (!enemy_main_destroyed) {
+    auto& targets = gAPI->observer().GameInfo().enemy_start_locations;
+    auto& it_loc = *iter;
+    sc2::Point2D unit_it_loc{it_loc->pos.x, it_loc->pos.y};
+    if (unit_it_loc == targets.front()) {
+      enemy_main_destroyed = true;
+    }
+  }
+  if (enemy_main_destroyed) {
+    // adds m_units to field_units only when something is destroyed. Other
+    // happens when attack_limit is reached.
+    for (auto i : m_units) field_units.push_back(i);
+    // still seem to be going ghost location and not finishing off rest of
+    // kill_list.
+    // worked last time vs protoss.
+    // investigate more.
+    // maybe need send idle marines to buildings_enemy[1] ???
+    gAPI->action().Attack(
+        field_units, {buildings_enemy[0]->pos.x, buildings_enemy[0]->pos.y});
+    std::cout << "Attack: " << buildings_enemy[0]->pos.x << ","
+              << buildings_enemy[0]->pos.y << std::endl;
+  }
 }
 
 bool Killbots::Should_Build_Expansion() {

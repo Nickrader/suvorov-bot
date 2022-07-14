@@ -37,7 +37,6 @@ struct Killbots : Strategy {
   int number_of_townhalls = 1;  // we start with one command center.
   int number_of_barracks = 0;
   int number_of_supplydepots = 0;
-  sc2::Units buildings_enemy;
-
+  sc2::Units buildings_enemy{};
   bool enemy_main_destroyed = false;
 };
