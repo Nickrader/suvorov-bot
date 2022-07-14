@@ -87,7 +87,6 @@ void Killbots::OnUnitDestroyed(const sc2::Unit* unit_,
 }
 
 void Killbots::OnUnitEnterVision(const sc2::Unit* unit_, Builder* builder_) {
-  // was I just missing some parantheses?  Yup, probably.
   if (unit_->Alliance::Enemy && sc2::IsBuilding()(unit_->unit_type)) {
     for (auto i : buildings_enemy) {
       if (unit_ == i) return;
@@ -146,8 +145,11 @@ void Killbots::TestTargeting(sc2::Units::iterator iter) {
     // maybe need send idle marines to buildings_enemy[1] ???
     gAPI->action().Attack(
         field_units, {buildings_enemy[0]->pos.x, buildings_enemy[0]->pos.y});
+    auto x = field_units.size();
+    std::cout << "Field Units Size: " << x << std::endl;
     std::cout << "Attack: " << buildings_enemy[0]->pos.x << ","
               << buildings_enemy[0]->pos.y << std::endl;
+    // I do not have right size of field_units.
   }
 }
 
