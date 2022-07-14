@@ -81,7 +81,8 @@ void Killbots::OnUnitDestroyed(const sc2::Unit* unit_,
     default:
       break;
   }
-
+  CleanUpBodies(m_units);
+  CleanUpBodies(field_units);
   DestroyedEnemyBuildings(unit_);
 }
 
