@@ -136,19 +136,11 @@ void Killbots::TestTargeting(sc2::Units::iterator iter) {
     }
   }
   if (enemy_main_destroyed) {
-    // adds m_units to field_units only when something is destroyed. Other
-    // happens when attack_limit is reached.
-    for (auto* i : m_units)
-        field_units.push_back(i);
-    // still seem to be going ghost location and not finishing off rest of
-    // kill_list.
-    // worked last time vs protoss.
-    // investigate more.
     // maybe need send idle marines to buildings_enemy[1] ???
     gAPI->action().Attack(
         field_units,
         {buildings_enemy[0]->pos.x, buildings_enemy[0]->pos.y});
-    // too big, lol.  What did I do.  Investigate field_units
+    // too big, maybe not???
     auto x = field_units.size(); // 140697229622753	unsigned __int64
 
     std::cout << "Field Units Size: " << x << std::endl;
