@@ -139,6 +139,10 @@ void Killbots::OnMainDestroyed(sc2::Units::iterator iter) {
     }
   }
 }
+
+// I get some orphaned units during initial assault after something is destroyed??
+// When it starts going through the kill list (after main destroyed), they get adopted
+// TODO: Why is this happening, orphaned units before (main_destroyed).
 void Killbots::AttackNextBuilding() {
   if (enemy_main_destroyed) {
     // unhandled exception, probably buildings_enemy.size0, added if check
@@ -146,12 +150,13 @@ void Killbots::AttackNextBuilding() {
       gAPI->action().Attack(
           field_units, {buildings_enemy[0]->pos.x, buildings_enemy[0]->pos.y});
   }
+  
   if (buildings_enemy.size() == 0) {
-      for (auto i : field_units) {
+      auto& expo = gHub->GetExpansions();
+      for (int i = 0; i < expo.size(); ++i) {
           sc2::Units xfer{};
-          xfer.push_back(i);
-          // is there a function to get random location???
-          gAPI->action().Attack(xfer, );
+          xfer.push_back(field_units[i]); //???
+          gAPI->action().Attack(xfer, { expo[i].town_hall_location.x,expo[i].town_hall_location.y });
       }
   }
 }
