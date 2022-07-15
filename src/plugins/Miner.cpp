@@ -18,7 +18,7 @@ namespace {
 const int mule_energy_cost = 50;
 
 void SecureMineralsIncome(Builder* builder_) {
-  if (gAPI->observer().CountUnitType(sc2::UNIT_TYPEID::TERRAN_SCV) > 80) {
+  if (gAPI->observer().CountUnitType(sc2::UNIT_TYPEID::TERRAN_SCV) < 80) {
     auto town_halls = gAPI->observer().GetUnits(sc2::IsTownHall());
 
     for (const auto& i : town_halls()) {

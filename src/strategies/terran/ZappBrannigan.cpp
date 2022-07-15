@@ -66,7 +66,6 @@ void Killbots::OnUnitCreated(const sc2::Unit* unit_, Builder* builder_) {
   }
 
   gAPI->action().Attack(units, rally);
-  //  Why is this needed?  Strategy::OnStep is called without calling in Killbots::OnStep
   Strategy::OnUnitCreated(unit_, builder_);
 }
 
