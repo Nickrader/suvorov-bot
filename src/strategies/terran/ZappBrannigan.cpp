@@ -116,7 +116,8 @@ void Killbots::DestroyedEnemyBuildings(const sc2::Unit* unit_) {
            ++it) {
         if (unit_ == *it) {
           TestTargeting(it);
-          buildings_enemy.erase(it);  // ? is this causing a problem?
+          // needed to add an end, single parameter overload not working as expected, cppreference not showing single param.
+          buildings_enemy.erase(it, buildings_enemy.end());  // ? is this causing a problem?
           break;
         }
       }
@@ -137,15 +138,19 @@ void Killbots::TestTargeting(sc2::Units::iterator iter) {
   if (enemy_main_destroyed) {
     // adds m_units to field_units only when something is destroyed. Other
     // happens when attack_limit is reached.
-    for (auto i : m_units) field_units.push_back(i);
+    for (auto* i : m_units)
+        field_units.push_back(i);
     // still seem to be going ghost location and not finishing off rest of
     // kill_list.
     // worked last time vs protoss.
     // investigate more.
     // maybe need send idle marines to buildings_enemy[1] ???
     gAPI->action().Attack(
-        field_units, {buildings_enemy[0]->pos.x, buildings_enemy[0]->pos.y});
-    auto x = field_units.size();
+        field_units,
+        {buildings_enemy[0]->pos.x, buildings_enemy[0]->pos.y});
+    // too big, lol.  What did I do.  Investigate field_units
+    auto x = field_units.size(); // 140697229622753	unsigned __int64
+
     std::cout << "Field Units Size: " << x << std::endl;
     std::cout << "Attack: " << buildings_enemy[0]->pos.x << ","
               << buildings_enemy[0]->pos.y << std::endl;
