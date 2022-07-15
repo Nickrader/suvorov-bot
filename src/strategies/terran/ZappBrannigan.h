@@ -23,15 +23,15 @@ struct Killbots : Strategy {
   void OnGameEnd() final;
 
  private:
-  bool Should_Build_Expansion();
+  bool ShouldBuildExpansion();
 
   void OnMainDestroyed(sc2::Units::iterator it);
 
   void AttackNextBuilding();
 
-  void build_barracks(const uint32_t& minerals, Builder* builder_);
+  void BuildBarracks(const uint32_t& minerals, Builder* builder_);
 
-  void build_commandcenter(const uint32_t& minerals, Builder* builder_);
+  void BuildCommandcenter(const uint32_t& minerals, Builder* builder_);
 
   void DestroyedEnemyBuildings(const sc2::Unit* unit_);
 

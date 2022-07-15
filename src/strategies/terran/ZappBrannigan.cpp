@@ -31,11 +31,11 @@ void Killbots::OnStep(Builder* builder_) {
   uint32_t minerals = gAPI->observer().GetMinerals();
 
   //  probably a better way to control flow, this is very simple implementatoin.
-  build_cc = Should_Build_Expansion();
+  build_cc = ShouldBuildExpansion();
 
-  if (build_cc) build_commandcenter(minerals, builder_);
+  if (build_cc) BuildCommandcenter(minerals, builder_);
 
-  if (!build_cc) build_barracks(minerals, builder_);
+  if (!build_cc) BuildBarracks(minerals, builder_);
 }
 
 void Killbots::OnUnitIdle(const sc2::Unit* unit_, Builder* builder_) {
@@ -140,28 +140,29 @@ void Killbots::OnMainDestroyed(sc2::Units::iterator iter) {
   }
 }
 
-// I get some orphaned units during initial assault after something is destroyed??
-// When it starts going through the kill list (after main destroyed), they get adopted
+// I get some orphaned units during initial assault after something is
+// destroyed?? When it starts going through the kill list (after main
+// destroyed), they get adopted
 // TODO: Why is this happening, orphaned units before (main_destroyed).
+//
 void Killbots::AttackNextBuilding() {
-  if (enemy_main_destroyed) {
-    // unhandled exception, probably buildings_enemy.size0, added if check
-    if (buildings_enemy.size() > 0)
-      gAPI->action().Attack(
-          field_units, {buildings_enemy[0]->pos.x, buildings_enemy[0]->pos.y});
-  }
-  
+
+  if (buildings_enemy.size() > 0)
+    gAPI->action().Attack(
+        field_units, {buildings_enemy[0]->pos.x, buildings_enemy[0]->pos.y});
+
   if (buildings_enemy.size() == 0) {
-      auto& expo = gHub->GetExpansions();
-      for (int i = 0; i < expo.size(); ++i) {
-          sc2::Units xfer{};
-          xfer.push_back(field_units[i]); //???
-          gAPI->action().Attack(xfer, { expo[i].town_hall_location.x,expo[i].town_hall_location.y });
-      }
+    auto& expo = gHub->GetExpansions();
+    for (int i = 0; i < expo.size() && i < field_units.size(); ++i) {
+      sc2::Units xfer{};
+      xfer.push_back(field_units[i]);
+      gAPI->action().Attack(
+          xfer, {expo[i].town_hall_location.x, expo[i].town_hall_location.y});
+    }
   }
 }
 
-bool Killbots::Should_Build_Expansion() {
+bool Killbots::ShouldBuildExpansion() {
   switch (number_of_townhalls) {
     case 1:
       if (number_of_barracks >= 1)
@@ -217,8 +218,7 @@ bool Killbots::Should_Build_Expansion() {
   }
 }
 
-void Killbots::build_commandcenter(const uint32_t& minerals,
-                                   Builder* builder_) {
+void Killbots::BuildCommandcenter(const uint32_t& minerals, Builder* builder_) {
   if (minerals >= 400) {
     // just try arbitrary number to avoid thousands of CC build orders.
     // TODO: make this expansions.size() test.
@@ -234,7 +234,7 @@ void Killbots::build_commandcenter(const uint32_t& minerals,
   }
 }
 
-void Killbots::build_barracks(const uint32_t& minerals, Builder* builder_) {
+void Killbots::BuildBarracks(const uint32_t& minerals, Builder* builder_) {
   {
     if (gAPI->observer().CountUnitType(sc2::UNIT_TYPEID::TERRAN_SUPPLYDEPOT) >
         0)
