@@ -66,11 +66,11 @@ void Killbots::OnUnitCreated(const sc2::Unit* unit_, Builder* builder_) {
   }
 
   gAPI->action().Attack(units, rally);
+  //  Why is this needed?  Strategy::OnStep is called without calling in Killbots::OnStep
   Strategy::OnUnitCreated(unit_, builder_);
 }
 
-void Killbots::OnUnitDestroyed(const sc2::Unit* unit_,
-                               Builder* builder_) {  // breakpoint, investigate
+void Killbots::OnUnitDestroyed(const sc2::Unit* unit_, Builder* builder_) {
   if (unit_->Alliance::Self) {
     switch (unit_->unit_type.ToType()) {
       case sc2::UNIT_TYPEID::TERRAN_COMMANDCENTER:
@@ -116,13 +116,13 @@ void Killbots::DestroyedEnemyBuildings(const sc2::Unit* unit_) {
   if (unit_->alliance == sc2::Unit::Alliance::Enemy)
     if (sc2::IsBuilding()(unit_->unit_type)) {
       for (sc2::Units::iterator it = buildings_enemy.begin();
-           it != buildings_enemy.end();
-           ++it) {
+           it != buildings_enemy.end(); ++it) {
         if (unit_ == *it) {
           OnMainDestroyed(it);
-          buildings_enemy.erase(remove(buildings_enemy.begin(), buildings_enemy.end(), *it),
+          buildings_enemy.erase(
+              remove(buildings_enemy.begin(), buildings_enemy.end(), *it),
               buildings_enemy.end());
-          break; // this might have fixed the out of range exception, unsure single building in vector
+          break;
         }
       }
       AttackNextBuilding();
@@ -141,8 +141,10 @@ void Killbots::OnMainDestroyed(sc2::Units::iterator iter) {
 }
 void Killbots::AttackNextBuilding() {
   if (enemy_main_destroyed) {
-    gAPI->action().Attack(
-        field_units, {buildings_enemy[0]->pos.x, buildings_enemy[0]->pos.y});
+    // unhandled exception, probably buildings_enemy
+    if (buildings_enemy.size() > 0)
+      gAPI->action().Attack(
+          field_units, {buildings_enemy[0]->pos.x, buildings_enemy[0]->pos.y});
   }
 }
 
