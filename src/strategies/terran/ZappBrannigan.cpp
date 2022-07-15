@@ -71,16 +71,19 @@ void Killbots::OnUnitCreated(const sc2::Unit* unit_, Builder* builder_) {
 
 void Killbots::OnUnitDestroyed(const sc2::Unit* unit_,
                                Builder* builder_) {  // breakpoint, investigate
-  switch (unit_->unit_type.ToType()) {
-    case sc2::UNIT_TYPEID::TERRAN_COMMANDCENTER:
-      --number_of_townhalls;
-      break;
-    case sc2::UNIT_TYPEID::TERRAN_BARRACKS:
-      --number_of_barracks;
-      break;
-    default:
-      break;
+  if (unit_->Alliance::Self) {
+    switch (unit_->unit_type.ToType()) {
+      case sc2::UNIT_TYPEID::TERRAN_COMMANDCENTER:
+        --number_of_townhalls;
+        break;
+      case sc2::UNIT_TYPEID::TERRAN_BARRACKS:
+        --number_of_barracks;
+        break;
+      default:
+        break;
+    }
   }
+  // probably better here than OnStep, only need to cleanup if UnitDestroyed
   CleanUpBodies(m_units);
   CleanUpBodies(field_units);
   DestroyedEnemyBuildings(unit_);
@@ -112,21 +115,21 @@ void Killbots::OnGameEnd() {
 void Killbots::DestroyedEnemyBuildings(const sc2::Unit* unit_) {
   if (unit_->alliance == sc2::Unit::Alliance::Enemy)
     if (sc2::IsBuilding()(unit_->unit_type)) {
-      for (auto it = buildings_enemy.begin(); it != buildings_enemy.end();
+      for (sc2::Units::iterator it = buildings_enemy.begin();
+           it != buildings_enemy.end();
            ++it) {
         if (unit_ == *it) {
-          TestTargeting(it);
-          // maybe can't use erase like this? leaving me with empty vector
-          buildings_enemy.erase(it, buildings_enemy.end()); 
-          break;
+          OnMainDestroyed(it);
+          buildings_enemy.erase(remove(buildings_enemy.begin(), buildings_enemy.end(), *it),
+              buildings_enemy.end());
+          break; // this might have fixed the out of range exception, unsure single building in vector
         }
       }
+      AttackNextBuilding();
     }
 }
 
-// I think I can split this up into 2 functions.
-// should I?  Is it doing more than one thing?
-void Killbots::TestTargeting(sc2::Units::iterator iter) {
+void Killbots::OnMainDestroyed(sc2::Units::iterator iter) {
   if (!enemy_main_destroyed) {
     auto& targets = gAPI->observer().GameInfo().enemy_start_locations;
     auto& it_loc = *iter;
@@ -135,18 +138,11 @@ void Killbots::TestTargeting(sc2::Units::iterator iter) {
       enemy_main_destroyed = true;
     }
   }
+}
+void Killbots::AttackNextBuilding() {
   if (enemy_main_destroyed) {
-    // maybe need send idle marines to buildings_enemy[1] ???
     gAPI->action().Attack(
-        field_units,
-        {buildings_enemy[0]->pos.x, buildings_enemy[0]->pos.y});
-    // too big, maybe not???
-    auto x = field_units.size(); // 140697229622753	unsigned __int64
-
-    std::cout << "Field Units Size: " << x << std::endl;
-    std::cout << "Attack: " << buildings_enemy[0]->pos.x << ","
-              << buildings_enemy[0]->pos.y << std::endl;
-    // I do not have right size of field_units.
+        field_units, {buildings_enemy[0]->pos.x, buildings_enemy[0]->pos.y});
   }
 }
 
