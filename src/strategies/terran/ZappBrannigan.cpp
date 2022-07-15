@@ -94,6 +94,7 @@ void Killbots::OnUnitEnterVision(const sc2::Unit* unit_, Builder* builder_) {
       if (unit_ == i) return;
     }
     buildings_enemy.push_back(unit_);
+    if (buildings_enemy.size() == 1) AttackNextBuilding();
   }
 }
 
@@ -140,10 +141,18 @@ void Killbots::OnMainDestroyed(sc2::Units::iterator iter) {
 }
 void Killbots::AttackNextBuilding() {
   if (enemy_main_destroyed) {
-    // unhandled exception, probably buildings_enemy
+    // unhandled exception, probably buildings_enemy.size0, added if check
     if (buildings_enemy.size() > 0)
       gAPI->action().Attack(
           field_units, {buildings_enemy[0]->pos.x, buildings_enemy[0]->pos.y});
+  }
+  if (buildings_enemy.size() == 0) {
+      for (auto i : field_units) {
+          sc2::Units xfer{};
+          xfer.push_back(i);
+          // is there a function to get random location???
+          gAPI->action().Attack(xfer, );
+      }
   }
 }
 
