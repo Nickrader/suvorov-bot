@@ -116,8 +116,8 @@ void Killbots::DestroyedEnemyBuildings(const sc2::Unit* unit_) {
            ++it) {
         if (unit_ == *it) {
           TestTargeting(it);
-          // needed to add an end, single parameter overload not working as expected, cppreference not showing single param.
-          buildings_enemy.erase(it, buildings_enemy.end());  // ? is this causing a problem?
+          // maybe can't use erase like this? leaving me with empty vector
+          buildings_enemy.erase(it, buildings_enemy.end()); 
           break;
         }
       }
