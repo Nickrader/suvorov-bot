@@ -8,6 +8,8 @@
 #include "core/API.h"
 // TODO:  Setup Git for some auto-squashing, make cleaner commit history when I
 // merge to dev branch
+// TODO: Building placement sometimes traps a grip of marines.  Big job.
+//
 namespace {
 Historican gHistory("strategy.ZappBrannigan");
 }  // namespace
@@ -15,12 +17,15 @@ Historican gHistory("strategy.ZappBrannigan");
 Killbots::Killbots() : Strategy(20.0f) {}
 
 void Killbots::OnGameStart(Builder* builder_) {
+  // Initialize variables
+  the_alamo = {gAPI->observer().GameInfo().enemy_start_locations.front().x,
+               gAPI->observer().GameInfo().enemy_start_locations.front().y};
+  std::cout << "\The Alamo: " << the_alamo.x << " , " << the_alamo.y
+            << std::endl;
+
+  // Give speech to boost morale
   std::cout << "Now, like all great plans, \
 my strategy is so simple an idiot could have devised it."
-            << std::endl;
-  std::cout << "\nEnemyStartLocations: "
-            << gAPI->observer().GameInfo().enemy_start_locations[0].x << ", "
-            << gAPI->observer().GameInfo().enemy_start_locations[0].y
             << std::endl;
 }
 
@@ -50,6 +55,7 @@ void Killbots::OnUnitIdle(const sc2::Unit* unit_, Builder* builder_) {
 }
 
 void Killbots::OnUnitCreated(const sc2::Unit* unit_, Builder* builder_) {
+  Strategy::OnUnitCreated(unit_, builder_);
   const Expansions& expansions = gHub->GetExpansions();
   sc2::Point3D natural_expansion =
       expansions[1].town_hall_location;  // works at [0] not [1] for realtime.
@@ -66,7 +72,6 @@ void Killbots::OnUnitCreated(const sc2::Unit* unit_, Builder* builder_) {
   }
 
   gAPI->action().Attack(units, rally);
-  Strategy::OnUnitCreated(unit_, builder_);
 }
 
 void Killbots::OnUnitDestroyed(const sc2::Unit* unit_, Builder* builder_) {
@@ -99,21 +104,27 @@ void Killbots::OnUnitEnterVision(const sc2::Unit* unit_, Builder* builder_) {
 }
 
 void Killbots::OnGameEnd() {
-  sc2::Point2D target{gAPI->observer().GameInfo().enemy_start_locations[0].x,
-                      gAPI->observer().GameInfo().enemy_start_locations[0].y};
   std::cout << "\nEnd Game:\n Barracks: " << number_of_barracks
             << "\nTownHalls: " << number_of_townhalls << std::endl;
   std::cout << "\nNumTargets: " << buildings_enemy.size() << std::endl;
-  std::cout << "\nTargetsFront(): " << target.x << " , " << target.y
-            << std::endl;
   for (auto i : buildings_enemy) {
     std::cout << "\n Target: " << i->pos.x << " , " << i->pos.y
               << "\n\tLast Seen: " << i->last_seen_game_loop << std::endl;
   }
+  // at the moment, best proxy for win/lose
+  if (buildings_enemy.size() ==
+      1) {  // 1 == win, game ends before removed from list, unless they killed
+            // me and I see only 1 building (rarer).
+    std::cout << "Call me cocky, but if there’s an alien out there, I can’t "
+                 "kill. I haven’t met him and killed him yet."
+              << std::endl;
+  } else
+    std::cout << "When I’m in command, every mission is a suicide mission."
+              << std::endl;
 }
 
 void Killbots::DestroyedEnemyBuildings(const sc2::Unit* unit_) {
-  if (unit_->alliance == sc2::Unit::Alliance::Enemy)
+  if (unit_->alliance == sc2::Unit::Alliance::Enemy) {
     if (sc2::IsBuilding()(unit_->unit_type)) {
       for (sc2::Units::iterator it = buildings_enemy.begin();
            it != buildings_enemy.end(); ++it) {
@@ -125,17 +136,7 @@ void Killbots::DestroyedEnemyBuildings(const sc2::Unit* unit_) {
           break;
         }
       }
-      AttackNextBuilding();
-    }
-}
-
-void Killbots::OnMainDestroyed(sc2::Units::iterator iter) {
-  if (!enemy_main_destroyed) {
-    auto& targets = gAPI->observer().GameInfo().enemy_start_locations;
-    auto& it_loc = *iter;
-    sc2::Point2D unit_it_loc{it_loc->pos.x, it_loc->pos.y};
-    if (unit_it_loc == targets.front()) {
-      enemy_main_destroyed = true;
+      if (enemy_main_destroyed) AttackNextBuilding();
     }
   }
 }
@@ -144,9 +145,20 @@ void Killbots::OnMainDestroyed(sc2::Units::iterator iter) {
 // destroyed?? When it starts going through the kill list (after main
 // destroyed), they get adopted
 // TODO: Why is this happening, orphaned units before (main_destroyed).
-//
-void Killbots::AttackNextBuilding() {
+// Idk, how I'd check this, unless I post all orders and last orders, timed with
+// building destruction.
 
+void Killbots::OnMainDestroyed(sc2::Units::iterator iter) {
+  if (!enemy_main_destroyed) {
+    auto& it_loc = *iter;
+    sc2::Point2D unit_it_loc{it_loc->pos.x, it_loc->pos.y};
+    if (unit_it_loc == the_alamo) {
+      enemy_main_destroyed = true;
+    }
+  }
+}
+
+void Killbots::AttackNextBuilding() {
   if (buildings_enemy.size() > 0)
     gAPI->action().Attack(
         field_units, {buildings_enemy[0]->pos.x, buildings_enemy[0]->pos.y});
@@ -220,9 +232,8 @@ bool Killbots::ShouldBuildExpansion() {
 
 void Killbots::BuildCommandcenter(const uint32_t& minerals, Builder* builder_) {
   if (minerals >= 400) {
-    // just try arbitrary number to avoid thousands of CC build orders.
-    // TODO: make this expansions.size() test.
-    if (number_of_townhalls >= 20) return;
+    // just arbitrary number to avoid tons of CC in build queue.
+    if (number_of_townhalls >= gHub->GetExpansions().size()) return;
     // not sure best supply to make urgent, try max (200) for now.
     if (gAPI->observer().GetFoodUsed() >= 200) {
       builder_->ScheduleObligatoryOrder(sc2::UNIT_TYPEID::TERRAN_COMMANDCENTER,
@@ -245,16 +256,3 @@ void Killbots::BuildBarracks(const uint32_t& minerals, Builder* builder_) {
       }
   }
 }
-
-// Killbots::OnStep()
-// should be a funtion, but is there better way to control flow????
-// FIXME(nickrader): possible cause of extra lag issues at max army supply?
-// lag more pronounced in Debug rather than Release compilation.
-// if (gAPI->observer().GetFoodUsed() == 200) {
-//  auto& targets = gAPI->observer().GameInfo().enemy_start_locations;
-//  for (auto i : m_units) {
-//    if (i->orders.empty()) {
-//      gAPI->action().Attack(m_units, targets.front());
-//    }
-//  }
-//}
