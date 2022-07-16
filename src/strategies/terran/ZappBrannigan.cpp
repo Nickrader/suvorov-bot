@@ -10,7 +10,6 @@
 // TODO:  Setup Git for some auto-squashing, make cleaner commit history when I
 // merge to dev branch
 // TODO: Building placement sometimes traps a grip of marines.  Big job.
-// TODO: AttackNextBuilding() needs some location logic, attack_closest? Closest to what? Last destroyed building.
 
 namespace {
 Historican gHistory("strategy.ZappBrannigan");
@@ -31,7 +30,6 @@ my strategy is so simple an idiot could have devised it."
             << std::endl;
 }
 
-// FIXME(nickrader): consolidate/ refactor
 void Killbots::OnStep(Builder* builder_) {
   Strategy::OnStep(builder_);
   // want minerals to update on step?  Or some more delay?
@@ -115,18 +113,24 @@ void Killbots::OnGameEnd() {
               << "\n\tLast Seen: " << i->last_seen_game_loop << std::endl;
   }
   // at the moment, best proxy for win/lose
-  if (buildings_enemy.size() <=
-      1 && gAPI->observer().GetUnits().operator()().size() >= 1) {
+  auto ii = gAPI->observer().GetUnits();
+  auto& i = ii.operator()();
+  int cnt = 0;
+  for (auto a : i) {
+    if (sc2::IsBuilding()(a->unit_type)) ++cnt;
+    std::cout << a->unit_type << std::endl;
+  }
+  if (buildings_enemy.size() <= 1 && cnt >= 1) {
     std::cout << "Call me cocky, but if there's an alien out there, I can't "
                  "kill. I haven't met him and killed him yet."
               << std::endl;
   } else
     std::cout << "When I'm in command, every mission is a suicide mission."
               << std::endl;
-   size_t muh_buildings = gAPI->observer().GetUnits().operator()().size();
-   auto enemy_buildings = buildings_enemy.size();
-   std::cout << "Mine: " << muh_buildings << std::endl;
-   std::cout << "Enemy: " << enemy_buildings << std::endl;
+  size_t muh_buildings = cnt;
+  auto enemy_buildings = buildings_enemy.size();
+  std::cout << "Mine: " << muh_buildings << std::endl;
+  std::cout << "Enemy: " << enemy_buildings << std::endl;
 }
 
 void Killbots::DestroyedEnemyBuildings(const sc2::Unit* unit_) {
@@ -160,10 +164,34 @@ void Killbots::IsMainDestroyed(sc2::Units::iterator iter) {
   }
 }
 
+// TODO: AttackNextBuilding() needs some location logic, attack_closest? Closest
+// to what? Last destroyed building.
+// search API ...
+// Using SortByDistance as template, basically copying.
+struct SortAttackBuildings {
+  // need distance between field_units[x] and buidings_enemy[y]
+  // then need bool compare dist, with ???
+  SortAttackBuildings(sc2::Units& army_);
+  bool operator()(const sc2::Unit* lhs_, const sc2::Unit* rhs_);
+
+ private:
+  sc2::Point2D kb_point;
+};
+SortAttackBuildings::SortAttackBuildings(sc2::Units& army_) : kb_point{0, 0} {
+  kb_point = {army_[0]->pos.x, army_[0]->pos.y};
+}
+
+bool SortAttackBuildings::operator()(const sc2::Unit* lhs_, const sc2::Unit* rhs_) {
+  return sc2::DistanceSquared2D({lhs_->pos.x, lhs_->pos.y}, {kb_point}) <
+         sc2::DistanceSquared2D({rhs_->pos.x, rhs_->pos.y}, {kb_point});
+}
+
 void Killbots::AttackNextBuilding() {
   if (buildings_enemy.size() > 0)
-    gAPI->action().Attack(
-        field_units, {buildings_enemy[0]->pos.x, buildings_enemy[0]->pos.y});
+    std::sort(buildings_enemy.begin(), buildings_enemy.end(),
+              SortAttackBuildings(field_units));
+  gAPI->action().Attack(field_units,
+                        {buildings_enemy[0]->pos.x, buildings_enemy[0]->pos.y});
 
   if (buildings_enemy.size() == 0) {
     auto& expo = gHub->GetExpansions();
