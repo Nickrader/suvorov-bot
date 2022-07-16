@@ -43,3 +43,11 @@ struct Killbots : Strategy {
   bool enemy_main_destroyed = false;
   sc2::Point2D the_alamo = {0, 0};
 };
+
+struct SortAttackBuildings { // copy of logic from Hub.cpp
+    SortAttackBuildings(sc2::Units& army_);
+    bool operator()(const sc2::Unit* lhs_, const sc2::Unit* rhs_);
+
+private:
+    sc2::Point2D kb_point;
+};
