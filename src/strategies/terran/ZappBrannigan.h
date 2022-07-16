@@ -25,7 +25,7 @@ struct Killbots : Strategy {
  private:
   bool ShouldBuildExpansion();
 
-  void OnMainDestroyed(sc2::Units::iterator it);
+  void IsMainDestroyed(sc2::Units::iterator it);
 
   void AttackNextBuilding();
 

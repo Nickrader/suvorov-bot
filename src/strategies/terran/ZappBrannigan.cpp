@@ -6,10 +6,12 @@
 #include "Historican.h"
 #include "Hub.h"
 #include "core/API.h"
+
 // TODO:  Setup Git for some auto-squashing, make cleaner commit history when I
 // merge to dev branch
 // TODO: Building placement sometimes traps a grip of marines.  Big job.
-//
+// TODO: AttackNextBuilding() needs some location logic, attack_closest? Closest to what? Last destroyed building.
+
 namespace {
 Historican gHistory("strategy.ZappBrannigan");
 }  // namespace
@@ -36,6 +38,7 @@ void Killbots::OnStep(Builder* builder_) {
   uint32_t minerals = gAPI->observer().GetMinerals();
 
   //  probably a better way to control flow, this is very simple implementatoin.
+  // probably don't need to execute every step.
   build_cc = ShouldBuildExpansion();
 
   if (build_cc) BuildCommandcenter(minerals, builder_);
@@ -112,15 +115,18 @@ void Killbots::OnGameEnd() {
               << "\n\tLast Seen: " << i->last_seen_game_loop << std::endl;
   }
   // at the moment, best proxy for win/lose
-  if (buildings_enemy.size() ==
-      1) {  // 1 == win, game ends before removed from list, unless they killed
-            // me and I see only 1 building (rarer).
-    std::cout << "Call me cocky, but if there’s an alien out there, I can’t "
-                 "kill. I haven’t met him and killed him yet."
+  if (buildings_enemy.size() <=
+      1 && gAPI->observer().GetUnits().operator()().size() >= 1) {
+    std::cout << "Call me cocky, but if there's an alien out there, I can't "
+                 "kill. I haven't met him and killed him yet."
               << std::endl;
   } else
-    std::cout << "When I’m in command, every mission is a suicide mission."
+    std::cout << "When I'm in command, every mission is a suicide mission."
               << std::endl;
+   size_t muh_buildings = gAPI->observer().GetUnits().operator()().size();
+   auto enemy_buildings = buildings_enemy.size();
+   std::cout << "Mine: " << muh_buildings << std::endl;
+   std::cout << "Enemy: " << enemy_buildings << std::endl;
 }
 
 void Killbots::DestroyedEnemyBuildings(const sc2::Unit* unit_) {
@@ -129,26 +135,22 @@ void Killbots::DestroyedEnemyBuildings(const sc2::Unit* unit_) {
       for (sc2::Units::iterator it = buildings_enemy.begin();
            it != buildings_enemy.end(); ++it) {
         if (unit_ == *it) {
-          OnMainDestroyed(it);
+          IsMainDestroyed(it);
           buildings_enemy.erase(
               remove(buildings_enemy.begin(), buildings_enemy.end(), *it),
               buildings_enemy.end());
-          break;
+          break;  // exception thrown if buildings_enemy.size() == 0
+          // if we've found the building to erase, no need to run rest of loop
+          // either.
         }
       }
+      if (!enemy_main_destroyed) gAPI->action().Attack(field_units, the_alamo);
       if (enemy_main_destroyed) AttackNextBuilding();
     }
   }
 }
 
-// I get some orphaned units during initial assault after something is
-// destroyed?? When it starts going through the kill list (after main
-// destroyed), they get adopted
-// TODO: Why is this happening, orphaned units before (main_destroyed).
-// Idk, how I'd check this, unless I post all orders and last orders, timed with
-// building destruction.
-
-void Killbots::OnMainDestroyed(sc2::Units::iterator iter) {
+void Killbots::IsMainDestroyed(sc2::Units::iterator iter) {
   if (!enemy_main_destroyed) {
     auto& it_loc = *iter;
     sc2::Point2D unit_it_loc{it_loc->pos.x, it_loc->pos.y};
