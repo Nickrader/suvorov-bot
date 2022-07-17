@@ -22,6 +22,8 @@ struct Killbots : Strategy {
 
   void OnGameEnd() final;
 
+  int GetNumCC();
+
  private:
   bool ShouldBuildExpansion();
 
@@ -42,6 +44,7 @@ struct Killbots : Strategy {
   sc2::Units buildings_enemy{};
   bool enemy_main_destroyed = false;
   sc2::Point2D the_alamo = {0, 0};
+  bool attacked = false;
 };
 
 struct SortAttackBuildings { // copy of logic from Hub.cpp
@@ -51,3 +54,5 @@ struct SortAttackBuildings { // copy of logic from Hub.cpp
 private:
     sc2::Point2D kb_point;
 };
+
+//extern std::unique_ptr<Killbots> gBot;

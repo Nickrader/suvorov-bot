@@ -11,7 +11,6 @@
 // vector?
 // TODO:  Setup Git for some auto-squashing, make cleaner commit history when I
 // merge to dev branch
-// TODO: Building placement sometimes traps a grip of marines.  Investigate.
 
 namespace {
 Historican gHistory("strategy.ZappBrannigan");
@@ -85,6 +84,7 @@ void Killbots::OnUnitDestroyed(const sc2::Unit* unit_, Builder* builder_) {
     switch (unit_->unit_type.ToType()) {
       case sc2::UNIT_TYPEID::TERRAN_COMMANDCENTER:
         --number_of_townhalls;
+        attacked = true;
         break;
       case sc2::UNIT_TYPEID::TERRAN_BARRACKS:
         --number_of_barracks;
@@ -124,7 +124,7 @@ void Killbots::OnGameEnd() {
   for (auto a : i) {
     if (sc2::IsBuilding()(a->unit_type)) {
       ++cnt;
-      std::cout << a->unit_type << std::endl;
+      std::cout << sc2::UnitTypeToName(a->unit_type) << std::endl;
     }
   }
   if (buildings_enemy.size() <= 1 && cnt >= 1) {
@@ -172,9 +172,10 @@ void Killbots::IsMainDestroyed(sc2::Units::iterator iter) {
 }
 
 void Killbots::AttackNextBuilding() {
-  if (buildings_enemy.size() > 0) {
+  if (buildings_enemy.size() > 0 && field_units.size() > 0) {
     std::sort(buildings_enemy.begin(), buildings_enemy.end(),
               SortAttackBuildings(field_units));
+
     gAPI->action().Attack(
         field_units, {buildings_enemy[0]->pos.x, buildings_enemy[0]->pos.y});
   }
@@ -182,22 +183,21 @@ void Killbots::AttackNextBuilding() {
     auto& expo = gHub->GetExpansions();
     for (int i = 0; i < expo.size() && i < field_units.size(); ++i) {
       sc2::Units xfer{};
-      xfer.push_back(field_units[i]);
+      if (field_units.size() > 0) xfer.push_back(field_units[i]);
       gAPI->action().Attack(
           xfer, {expo[i].town_hall_location.x, expo[i].town_hall_location.y});
     }
   }
 }
 
-
-SortAttackBuildings::SortAttackBuildings(sc2::Units& army_) : kb_point{ 0, 0 } {
-    kb_point = { army_[0]->pos.x, army_[0]->pos.y };
+SortAttackBuildings::SortAttackBuildings(sc2::Units& army_) : kb_point{0, 0} {
+  kb_point = {army_[0]->pos.x, army_[0]->pos.y};
 }
 
 bool SortAttackBuildings::operator()(const sc2::Unit* lhs_,
-    const sc2::Unit* rhs_) {
-    return sc2::DistanceSquared2D({ lhs_->pos.x, lhs_->pos.y }, { kb_point }) <
-        sc2::DistanceSquared2D({ rhs_->pos.x, rhs_->pos.y }, { kb_point });
+                                     const sc2::Unit* rhs_) {
+  return sc2::DistanceSquared2D({lhs_->pos.x, lhs_->pos.y}, {kb_point}) <
+         sc2::DistanceSquared2D({rhs_->pos.x, rhs_->pos.y}, {kb_point});
 }
 
 bool Killbots::ShouldBuildExpansion() {
@@ -256,6 +256,7 @@ bool Killbots::ShouldBuildExpansion() {
   }
 }
 
+// if under attack (townhalls decremented) then we should not build CC 'urgent')
 void Killbots::BuildCommandcenter(const uint32_t& minerals, Builder* builder_) {
   if (minerals >= 400) {
     // just arbitrary number to avoid tons of CC in build queue.
@@ -265,7 +266,9 @@ void Killbots::BuildCommandcenter(const uint32_t& minerals, Builder* builder_) {
       builder_->ScheduleObligatoryOrder(sc2::UNIT_TYPEID::TERRAN_COMMANDCENTER,
                                         true);
     } else {
-      builder_->ScheduleObligatoryOrder(sc2::UNIT_TYPEID::TERRAN_COMMANDCENTER);
+      if (!attacked)  // not perfect, but see how it plays out.
+        builder_->ScheduleObligatoryOrder(
+            sc2::UNIT_TYPEID::TERRAN_COMMANDCENTER);
     }
     ++number_of_townhalls;
   }
@@ -282,3 +285,13 @@ void Killbots::BuildBarracks(const uint32_t& minerals, Builder* builder_) {
       }
   }
 }
+
+// problems
+// m_plugins is my object?
+
+//int Killbots::GetNumCC() { return number_of_townhalls; }
+//
+//std::unique_ptr<Killbots> gBot;
+
+// Hub.cpp line 261 AssignBuildTask ... Hub/ the worker/ does the order.
+// API.cpp last place the Build() ends before hitting the sc2_api
