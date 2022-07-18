@@ -9,8 +9,9 @@
 
 // TODO: Use my fork of sc2_api to make possible Attack() take Unit instead of
 // vector?
-// TODO:  Setup Git for some auto-squashing, make cleaner commit history when I
-// merge to dev branch
+// TODO:  Setup Git workflow, may have to be in GitBash?  Get better commits, branching, etc.
+//              Seem to be wasting much time trying to figure out Git in MSVS.
+
 
 namespace {
 Historican gHistory("strategy.ZappBrannigan");
@@ -190,6 +191,7 @@ void Killbots::AttackNextBuilding() {
   }
 }
 
+// copy of logic from Hub.cpp
 SortAttackBuildings::SortAttackBuildings(sc2::Units& army_) : kb_point{0, 0} {
   kb_point = {army_[0]->pos.x, army_[0]->pos.y};
 }
@@ -285,13 +287,3 @@ void Killbots::BuildBarracks(const uint32_t& minerals, Builder* builder_) {
       }
   }
 }
-
-// problems
-// m_plugins is my object?
-
-//int Killbots::GetNumCC() { return number_of_townhalls; }
-//
-//std::unique_ptr<Killbots> gBot;
-
-// Hub.cpp line 261 AssignBuildTask ... Hub/ the worker/ does the order.
-// API.cpp last place the Build() ends before hitting the sc2_api

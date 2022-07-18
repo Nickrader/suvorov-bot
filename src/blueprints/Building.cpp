@@ -4,10 +4,11 @@
 
 #include "Building.h"
 
+#include <Dispatcher.h>
+#include <strategies/terran/ZappBrannigan.h>
+
 #include "Hub.h"
 #include "core/API.h"
-#include <strategies/terran/ZappBrannigan.h>
-#include <Dispatcher.h>
 
 bool Building::Build(Order* order_) {
   // Find place to build the structure
@@ -18,12 +19,22 @@ bool Building::Build(Order* order_) {
   do {
     point.x = base.x + sc2::GetRandomScalar() * 15.0f;
     point.y = base.y + sc2::GetRandomScalar() * 15.0f;
-    if (++attempt > 150) {
+    // modified if check to allieviate congestion.
+    if (++attempt > 150 || gAPI->observer().CountUnitType(
+                               sc2::UNIT_TYPEID::TERRAN_COMMANDCENTER) > 1) {
       do {
         point.x = base.x + sc2::GetRandomScalar() * 25.0f;
         point.y = base.y + sc2::GetRandomScalar() * 25.0f;
 
-        if (++attempt > 150) return false;
+        if (++attempt > 150 ||
+            gAPI->observer().CountUnitType(
+                sc2::UNIT_TYPEID::TERRAN_COMMANDCENTER) > 2) {
+          do {
+            point.x = base.x + sc2::GetRandomScalar() * 40.0f;
+            point.y = base.y + sc2::GetRandomScalar() * 40.0f;
+            if (++attempt > 150) return false;
+          } while (!gAPI->query().CanBePlaced(*order_, point));
+        }
       } while (!gAPI->query().CanBePlaced(*order_, point));
     }
     // return false;
@@ -31,10 +42,3 @@ bool Building::Build(Order* order_) {
 
   return gHub->AssignBuildTask(order_, point);
 }
-
-// could use pointer to ZappBrannigan::number_of_townhalls as flow control, to bigger
-// build area, if nat or third taken, much more room to build.
-// right now my pointer is worthless, debugger shows it points to nothing.
-//
-// ptr is never instantiated like gHub or gAPI
-// m_plugins takes the riff raff, but can't access it without looping ???
