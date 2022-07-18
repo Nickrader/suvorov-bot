@@ -22,8 +22,6 @@ struct Killbots : Strategy {
 
   void OnGameEnd() final;
 
-  int GetNumCC();
-
  private:
   bool ShouldBuildExpansion();
 
@@ -37,6 +35,10 @@ struct Killbots : Strategy {
 
   void DestroyedEnemyBuildings(const sc2::Unit* unit_);
 
+  void StutterStepInitiate(const sc2::Units& units_, sc2::Point2D& point_);
+
+  void StutterStepAttack(const sc2::Units& units_, sc2::Point2D& point_);
+
   bool build_cc = false;
   int number_of_townhalls = 1;  // we start with one command center.
   int number_of_barracks = 0;
@@ -45,6 +47,9 @@ struct Killbots : Strategy {
   bool enemy_main_destroyed = false;
   sc2::Point2D the_alamo = {0, 0};
   bool attacked = false;
+  bool stutter = false;
+  uint32_t stutter_frame_attack = 500000; // TODO: fix garbage value
+  uint32_t stutter_frame_move = 0; // TODO: fix garbage value
 };
 
 struct SortAttackBuildings { // copy of logic from Hub.cpp

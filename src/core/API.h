@@ -28,6 +28,8 @@ struct Action {
 
     void Attack(const sc2::Units& units_, const sc2::Point2D& point_);
 
+    void Move(const sc2::Units& units_, const sc2::Point2D& point_);
+
     void Cast(const sc2::Unit& assignee_, sc2::ABILITY_ID ability_);
 
     void Cast(const sc2::Unit& assignee_, sc2::ABILITY_ID ability_,

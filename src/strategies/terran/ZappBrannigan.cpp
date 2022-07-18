@@ -46,6 +46,8 @@ void Killbots::OnStep(Builder* builder_) {
   if (build_cc) BuildCommandcenter(minerals, builder_);
 
   if (!build_cc) BuildBarracks(minerals, builder_);
+
+  StutterStepAttack(field_units, the_alamo);
 }
 
 void Killbots::OnUnitIdle(const sc2::Unit* unit_, Builder* builder_) {
@@ -56,7 +58,8 @@ void Killbots::OnUnitIdle(const sc2::Unit* unit_, Builder* builder_) {
         gHistory.info() << "Schedule Marine training\n";
         break;
       } else {
-        builder_->ScheduleObligatoryOrder(sc2::UNIT_TYPEID::TERRAN_MARINE, true);
+        builder_->ScheduleObligatoryOrder(sc2::UNIT_TYPEID::TERRAN_MARINE,
+                                          true);
         gHistory.info() << "Scheulde Marine conscription\n";
         break;
       }
@@ -106,6 +109,7 @@ void Killbots::OnUnitDestroyed(const sc2::Unit* unit_, Builder* builder_) {
   CleanUpBodies(m_units);
   CleanUpBodies(field_units);
   DestroyedEnemyBuildings(unit_);
+  StutterStepInitiate(field_units, the_alamo);
 }
 
 void Killbots::OnUnitEnterVision(const sc2::Unit* unit_, Builder* builder_) {
@@ -298,5 +302,43 @@ void Killbots::BuildBarracks(const uint32_t& minerals, Builder* builder_) {
                                           true);
         ++number_of_barracks;
       }
+  }
+}
+
+// stutter-step:
+// have a control group (Units*) // we'll use field_units for now.
+// issue move command to Units // gAPI->
+// wait num_frames /* ?arbitrary? ?based on weapon attack speed? ?based on
+// other? issue attack move to same group. wait num_frames ...
+// // repeat.
+
+// for now implement in OnUnitEnterVision or OnUnitDestroyed.
+// I will break this for sure...  But on we go.
+
+// breaking up into seperate actions seems to make sense.
+void Killbots::StutterStepInitiate(const sc2::Units& units_,
+                                   sc2::Point2D& point_) {
+  if (!stutter) {
+    // unless intialize stutter_frame_move some other way, having is be
+    // less-than, causes problems for keeping attack duration.
+    if (stutter_frame_move < gAPI->observer().GetGameLoop()) {
+      gAPI->action().Move(units_, point_);
+      stutter_frame_attack = gAPI->observer().GetGameLoop() + 12;
+      stutter_frame_move = gAPI->observer().GetGameLoop() + 24;
+      stutter = true;
+    }
+  }
+}
+
+void Killbots::StutterStepAttack(const sc2::Units& units_,
+                                 sc2::Point2D& point_) {
+  if (stutter) {
+    if (stutter_frame_move == gAPI->observer().GetGameLoop()) {
+      gAPI->action().Attack(units_, point_);
+    }
+    if (stutter_frame_attack == gAPI->observer().GetGameLoop()) {
+      gAPI->action().Attack(units_, point_);
+      stutter = false;
+    }
   }
 }
