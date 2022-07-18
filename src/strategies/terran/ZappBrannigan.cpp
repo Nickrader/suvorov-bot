@@ -7,11 +7,13 @@
 #include "Hub.h"
 #include "core/API.h"
 
-// TODO: Use my fork of sc2_api to make possible Attack() take Unit instead of
-// vector?
-// TODO:  Setup Git workflow, may have to be in GitBash?  Get better commits, branching, etc.
-//              Seem to be wasting much time trying to figure out Git in MSVS.
-
+// TODO: Use my fork of sc2_api to make possible Attack() take Unit* instead of
+// vector<Unit*>?
+//
+// TODO:  Setup Git workflow, may have to be in GitBash?  Get better commits,
+// branching, etc.
+//              Seem to be wasting too much time trying to figure out Git in
+//              MSVS.
 
 namespace {
 Historican gHistory("strategy.ZappBrannigan");
@@ -49,9 +51,15 @@ void Killbots::OnStep(Builder* builder_) {
 void Killbots::OnUnitIdle(const sc2::Unit* unit_, Builder* builder_) {
   switch (unit_->unit_type.ToType()) {
     case sc2::UNIT_TYPEID::TERRAN_BARRACKS:
-      builder_->ScheduleObligatoryOrder(sc2::UNIT_TYPEID::TERRAN_MARINE);
-      gHistory.info() << "Schedule Marine training\n";
-      break;
+      if (!attacked) {
+        builder_->ScheduleObligatoryOrder(sc2::UNIT_TYPEID::TERRAN_MARINE);
+        gHistory.info() << "Schedule Marine training\n";
+        break;
+      } else {
+        builder_->ScheduleObligatoryOrder(sc2::UNIT_TYPEID::TERRAN_MARINE, true);
+        gHistory.info() << "Scheulde Marine conscription\n";
+        break;
+      }
     default:
       break;
   }
@@ -263,15 +271,20 @@ void Killbots::BuildCommandcenter(const uint32_t& minerals, Builder* builder_) {
   if (minerals >= 400) {
     // just arbitrary number to avoid tons of CC in build queue.
     if (number_of_townhalls >= gHub->GetExpansions().size()) return;
-    // not sure best supply to make urgent, try max (200) for now.
-    if (gAPI->observer().GetFoodUsed() >= 200) {
+    // peaceful game; prosper and multiply.
+    if (gAPI->observer().GetFoodUsed() >= 200 && !attacked) {
       builder_->ScheduleObligatoryOrder(sc2::UNIT_TYPEID::TERRAN_COMMANDCENTER,
                                         true);
-    } else {
-      if (!attacked)  // not perfect, but see how it plays out.
-        builder_->ScheduleObligatoryOrder(
-            sc2::UNIT_TYPEID::TERRAN_COMMANDCENTER);
     }
+    // getting spicy, not yet ready to spread like virus
+    if (!attacked) {
+      builder_->ScheduleObligatoryOrder(sc2::UNIT_TYPEID::TERRAN_COMMANDCENTER);
+    }
+    // houston we have a problem.
+    if (attacked) {
+      builder_->ScheduleOptionalOrder(sc2::UNIT_TYPEID::TERRAN_COMMANDCENTER);
+    }
+
     ++number_of_townhalls;
   }
 }
