@@ -319,26 +319,19 @@ void Killbots::BuildBarracks(const uint32_t& minerals, Builder* builder_) {
 void Killbots::StutterStepInitiate(const sc2::Units& units_,
                                    sc2::Point2D& point_) {
   if (!stutter) {
-    // unless intialize stutter_frame_move some other way, having is be
-    // less-than, causes problems for keeping attack duration.
-    if (stutter_frame_move < gAPI->observer().GetGameLoop()) {
-      gAPI->action().Move(units_, point_);
-      stutter_frame_attack = gAPI->observer().GetGameLoop() + 12;
-      stutter_frame_move = gAPI->observer().GetGameLoop() + 24;
-      stutter = true;
-    }
+    stutter_frame_attack = gAPI->observer().GetGameLoop() + 24;
+    stutter_frame_move = gAPI->observer().GetGameLoop() + 24;
+    stutter = true;
   }
 }
 
 void Killbots::StutterStepAttack(const sc2::Units& units_,
                                  sc2::Point2D& point_) {
-  if (stutter) {
-    if (stutter_frame_move == gAPI->observer().GetGameLoop()) {
-      gAPI->action().Attack(units_, point_);
-    }
-    if (stutter_frame_attack == gAPI->observer().GetGameLoop()) {
-      gAPI->action().Attack(units_, point_);
-      stutter = false;
-    }
+  if (stutter_frame_move == gAPI->observer().GetGameLoop()) {
+    gAPI->action().Attack(units_, point_);
+  }
+  if (stutter_frame_attack == gAPI->observer().GetGameLoop()) {
+    gAPI->action().Attack(units_, point_);
+    stutter = false;
   }
 }
