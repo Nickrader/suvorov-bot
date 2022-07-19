@@ -105,6 +105,7 @@ int main(int argc, char* argv[]) {
 
     // NOTE (alkurbatov): Uncomment to play at normal speed.
     // coordinator.SetRealtime(true);
+    coordinator.SetWindowLocation(0, 312);
 
     Dispatcher bot("TrainingDummy");
     coordinator.SetParticipants({

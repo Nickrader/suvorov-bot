@@ -47,7 +47,7 @@ void Killbots::OnStep(Builder* builder_) {
 
   if (!build_cc) BuildBarracks(minerals, builder_);
 
-  StutterStepAttack(field_units, stutter_target);
+  StutterStepAttack(field_units, stutter_target, goal);
 }
 
 void Killbots::OnUnitIdle(const sc2::Unit* unit_, Builder* builder_) {
@@ -100,10 +100,10 @@ void Killbots::OnUnitDestroyed(const sc2::Unit* unit_, Builder* builder_) {
       default:
         break;
     }
+    // probably better here than OnStep, only need to cleanup if UnitDestroyed
+    CleanUpBodies(m_units);
+    CleanUpBodies(field_units);
   }
-  // probably better here than OnStep, only need to cleanup if UnitDestroyed
-  CleanUpBodies(m_units);
-  CleanUpBodies(field_units);
   DestroyedEnemyBuildings(unit_);
 }
 
@@ -113,10 +113,12 @@ void Killbots::OnUnitEnterVision(const sc2::Unit* unit_, Builder* builder_) {
       if (unit_ == i) return;
     }
     buildings_enemy.push_back(unit_);
-    if (buildings_enemy.size() == 1) AttackNextBuilding();
+    if (buildings_enemy.size() == 1 && enemy_main_destroyed)
+      AttackNextBuilding();  // here is where goal is being reassigned before
+                             // main_destryoed.
   }
   if (unit_->Alliance::Enemy && IsCombatUnit()(*unit_)) {
-    StutterStepInitiate({unit_->pos.x, unit_->pos.y});
+      StutterStepInitiate({unit_->pos.x, unit_->pos.y});
   }
 }
 
@@ -176,7 +178,7 @@ void Killbots::IsMainDestroyed(sc2::Units::iterator iter) {
   if (!enemy_main_destroyed) {
     auto& it_loc = *iter;
     sc2::Point2D unit_it_loc{it_loc->pos.x, it_loc->pos.y};
-    if (unit_it_loc == goal) {
+    if (unit_it_loc == the_alamo) {
       enemy_main_destroyed = true;
     }
   }
@@ -302,34 +304,32 @@ void Killbots::BuildBarracks(const uint32_t& minerals, Builder* builder_) {
   }
 }
 
-// Better trigger than OnUnitEnterVision ??? Yes, but this works surprisingly
-// well compared to OnUnitDestroyed.
-
-// wants to stutter to point when anything is seen.
-// needs a reset frame, to Attack(current_goal);
-
 void Killbots::StutterStepInitiate(sc2::Point2D point_) {
   if (!stutter) {
     stutter_frame_move = gAPI->observer().GetGameLoop() + 1;
-    stutter_frame_attack = gAPI->observer().GetGameLoop() + (stutter_size / 2);
+    stutter_frame_attack = gAPI->observer().GetGameLoop() + (stutter_steps / 2);
     stutter = true;
     stutter_target = point_;
   }
+  return;
 }
 
 void Killbots::StutterStepAttack(const sc2::Units& units_,
-                                 sc2::Point2D& point_) {
-  if (!stutter) return;
+    sc2::Point2D& point_, sc2::Point2D& exit_) {
+    if (!stutter) return;
+    uint32_t x = gAPI->observer().GetGameLoop();
 
-  if (stutter_frame_move == gAPI->observer().GetGameLoop()) {
-    gAPI->action().Move(units_, point_);
-    stutter_frame_move = gAPI->observer().GetGameLoop() + stutter_size;
-  }
+    if (stutter_frame_move == x) {
+        gAPI->action().Move(units_, point_);
+        stutter_frame_move = x + stutter_steps;
+    }
 
-  if (stutter_frame_attack == gAPI->observer().GetGameLoop()) {
-    gAPI->action().Attack(units_, point_);
-    stutter_frame_attack == gAPI->observer().GetGameLoop() + stutter_size;
-  }
-  if ((stutter_frame_attack + stutter) == gAPI->observer().GetGameLoop())
-    gAPI->action().Attack(units_, goal);
+    if (stutter_frame_attack == x) {
+        gAPI->action().Attack(units_, point_);
+        //stutter_frame_attack = x + stutter_steps;
+    }
+    if ((stutter_frame_attack + stutter_steps) == x) {
+        gAPI->action().Attack(units_, exit_);
+        stutter = false; // can have only one false in function
+    }
 }

@@ -37,7 +37,7 @@ struct Killbots : Strategy {
 
   void StutterStepInitiate(sc2::Point2D point_);
 
-  void StutterStepAttack(const sc2::Units& units_, sc2::Point2D& point_);
+  void StutterStepAttack(const sc2::Units& units_, sc2::Point2D& point_, sc2::Point2D& goal_);
 
   bool build_cc = false;
   int number_of_townhalls = 1;  // we start with one command center.
@@ -50,7 +50,7 @@ struct Killbots : Strategy {
   bool stutter = false;
   uint32_t stutter_frame_attack = 0;  // TODO: fix garbage value
   uint32_t stutter_frame_move = 0;    // TODO: fix garbage value
-  uint32_t stutter_size = 12;         // frames for full stutter (move/attack)
+  uint32_t stutter_steps = 12;         // frames for full stutter (move/attack)
   sc2::Point2D stutter_target;
   sc2::Point2D goal;
 };
