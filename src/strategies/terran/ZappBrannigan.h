@@ -35,7 +35,7 @@ struct Killbots : Strategy {
 
   void DestroyedEnemyBuildings(const sc2::Unit* unit_);
 
-  void StutterStepInitiate(const sc2::Units& units_, sc2::Point2D& point_);
+  void StutterStepInitiate(sc2::Point2D point_);
 
   void StutterStepAttack(const sc2::Units& units_, sc2::Point2D& point_);
 
@@ -48,14 +48,17 @@ struct Killbots : Strategy {
   sc2::Point2D the_alamo = {0, 0};
   bool attacked = false;
   bool stutter = false;
-  uint32_t stutter_frame_attack = 500000; // TODO: fix garbage value
-  uint32_t stutter_frame_move = 0; // TODO: fix garbage value
+  uint32_t stutter_frame_attack = 0;  // TODO: fix garbage value
+  uint32_t stutter_frame_move = 0;    // TODO: fix garbage value
+  uint32_t stutter_size = 12;         // frames for full stutter (move/attack)
+  sc2::Point2D stutter_target;
+  sc2::Point2D goal;
 };
 
-struct SortAttackBuildings { // copy of logic from Hub.cpp
-    SortAttackBuildings(sc2::Units& army_);
-    bool operator()(const sc2::Unit* lhs_, const sc2::Unit* rhs_);
+struct SortAttackBuildings {  // copy of logic from Hub.cpp
+  SortAttackBuildings(sc2::Units& army_);
+  bool operator()(const sc2::Unit* lhs_, const sc2::Unit* rhs_);
 
-private:
-    sc2::Point2D kb_point;
+ private:
+  sc2::Point2D kb_point;
 };

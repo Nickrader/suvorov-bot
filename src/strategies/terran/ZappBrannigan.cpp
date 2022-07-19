@@ -6,25 +6,25 @@
 #include "Historican.h"
 #include "Hub.h"
 #include "core/API.h"
+#include "core/Helpers.h"
 
 // TODO: Use my fork of sc2_api to make possible Attack() take Unit* instead of
 // vector<Unit*>?
 //
 // TODO:  Setup Git workflow, may have to be in GitBash?  Get better commits,
 // branching, etc.
-//              Seem to be wasting too much time trying to figure out Git in
-//              MSVS.
 
 namespace {
 Historican gHistory("strategy.ZappBrannigan");
 }  // namespace
 
-Killbots::Killbots() : Strategy(20.0f) {}
+Killbots::Killbots() : Strategy(20.0f), stutter_target({0, 0}), goal({0, 0}) {}
 
 void Killbots::OnGameStart(Builder* builder_) {
   // Initialize variables
   the_alamo = {gAPI->observer().GameInfo().enemy_start_locations.front().x,
                gAPI->observer().GameInfo().enemy_start_locations.front().y};
+  goal = the_alamo;
   std::cout << "\The Alamo: " << the_alamo.x << " , " << the_alamo.y
             << std::endl;
 
@@ -47,7 +47,7 @@ void Killbots::OnStep(Builder* builder_) {
 
   if (!build_cc) BuildBarracks(minerals, builder_);
 
-  StutterStepAttack(field_units, the_alamo);
+  StutterStepAttack(field_units, stutter_target);
 }
 
 void Killbots::OnUnitIdle(const sc2::Unit* unit_, Builder* builder_) {
@@ -74,10 +74,6 @@ void Killbots::OnUnitCreated(const sc2::Unit* unit_, Builder* builder_) {
   sc2::Point3D natural_expansion =
       expansions[1].town_hall_location;  // works at [0] not [1] for realtime.
   sc2::Point2D rally(natural_expansion.x, natural_expansion.y);
-  // converst sc2::Unit to sc2::Units b/c that is what Attack takes as arg
-  // Techincally I could use my sc2_api PR in this project and then modify
-  // API.cpp so I don't to convert to Units everytime I want to issue attack
-  // order to single Unit
   sc2::Units units{};
 
   switch (unit_->unit_type.ToType()) {
@@ -109,7 +105,6 @@ void Killbots::OnUnitDestroyed(const sc2::Unit* unit_, Builder* builder_) {
   CleanUpBodies(m_units);
   CleanUpBodies(field_units);
   DestroyedEnemyBuildings(unit_);
-  StutterStepInitiate(field_units, the_alamo);
 }
 
 void Killbots::OnUnitEnterVision(const sc2::Unit* unit_, Builder* builder_) {
@@ -119,6 +114,9 @@ void Killbots::OnUnitEnterVision(const sc2::Unit* unit_, Builder* builder_) {
     }
     buildings_enemy.push_back(unit_);
     if (buildings_enemy.size() == 1) AttackNextBuilding();
+  }
+  if (unit_->Alliance::Enemy && IsCombatUnit()(*unit_)) {
+    StutterStepInitiate({unit_->pos.x, unit_->pos.y});
   }
 }
 
@@ -168,7 +166,7 @@ void Killbots::DestroyedEnemyBuildings(const sc2::Unit* unit_) {
           // either.
         }
       }
-      if (!enemy_main_destroyed) gAPI->action().Attack(field_units, the_alamo);
+      if (!enemy_main_destroyed) gAPI->action().Attack(field_units, goal);
       if (enemy_main_destroyed) AttackNextBuilding();
     }
   }
@@ -178,7 +176,7 @@ void Killbots::IsMainDestroyed(sc2::Units::iterator iter) {
   if (!enemy_main_destroyed) {
     auto& it_loc = *iter;
     sc2::Point2D unit_it_loc{it_loc->pos.x, it_loc->pos.y};
-    if (unit_it_loc == the_alamo) {
+    if (unit_it_loc == goal) {
       enemy_main_destroyed = true;
     }
   }
@@ -189,8 +187,8 @@ void Killbots::AttackNextBuilding() {
     std::sort(buildings_enemy.begin(), buildings_enemy.end(),
               SortAttackBuildings(field_units));
 
-    gAPI->action().Attack(
-        field_units, {buildings_enemy[0]->pos.x, buildings_enemy[0]->pos.y});
+    goal = {buildings_enemy[0]->pos.x, buildings_enemy[0]->pos.y};
+    gAPI->action().Attack(field_units, goal);
   }
   if (buildings_enemy.size() == 0) {
     auto& expo = gHub->GetExpansions();
@@ -275,16 +273,16 @@ void Killbots::BuildCommandcenter(const uint32_t& minerals, Builder* builder_) {
   if (minerals >= 400) {
     // just arbitrary number to avoid tons of CC in build queue.
     if (number_of_townhalls >= gHub->GetExpansions().size()) return;
-    // peaceful game; prosper and multiply.
+
     if (gAPI->observer().GetFoodUsed() >= 200 && !attacked) {
       builder_->ScheduleObligatoryOrder(sc2::UNIT_TYPEID::TERRAN_COMMANDCENTER,
                                         true);
     }
-    // getting spicy, not yet ready to spread like virus
+
     if (!attacked) {
       builder_->ScheduleObligatoryOrder(sc2::UNIT_TYPEID::TERRAN_COMMANDCENTER);
     }
-    // houston we have a problem.
+
     if (attacked) {
       builder_->ScheduleOptionalOrder(sc2::UNIT_TYPEID::TERRAN_COMMANDCENTER);
     }
@@ -298,40 +296,40 @@ void Killbots::BuildBarracks(const uint32_t& minerals, Builder* builder_) {
     if (gAPI->observer().CountUnitType(sc2::UNIT_TYPEID::TERRAN_SUPPLYDEPOT) >
         0)
       if (minerals >= 150) {
-        builder_->ScheduleObligatoryOrder(sc2::UNIT_TYPEID::TERRAN_BARRACKS,
-                                          true);
+        builder_->ScheduleObligatoryOrder(sc2::UNIT_TYPEID::TERRAN_BARRACKS);
         ++number_of_barracks;
       }
   }
 }
 
-// stutter-step:
-// have a control group (Units*) // we'll use field_units for now.
-// issue move command to Units // gAPI->
-// wait num_frames /* ?arbitrary? ?based on weapon attack speed? ?based on
-// other? issue attack move to same group. wait num_frames ...
-// // repeat.
+// Better trigger than OnUnitEnterVision ??? Yes, but this works surprisingly
+// well compared to OnUnitDestroyed.
 
-// for now implement in OnUnitEnterVision or OnUnitDestroyed.
-// I will break this for sure...  But on we go.
+// wants to stutter to point when anything is seen.
+// needs a reset frame, to Attack(current_goal);
 
-// breaking up into seperate actions seems to make sense.
-void Killbots::StutterStepInitiate(const sc2::Units& units_,
-                                   sc2::Point2D& point_) {
+void Killbots::StutterStepInitiate(sc2::Point2D point_) {
   if (!stutter) {
-    stutter_frame_attack = gAPI->observer().GetGameLoop() + 24;
-    stutter_frame_move = gAPI->observer().GetGameLoop() + 24;
+    stutter_frame_move = gAPI->observer().GetGameLoop() + 1;
+    stutter_frame_attack = gAPI->observer().GetGameLoop() + (stutter_size / 2);
     stutter = true;
+    stutter_target = point_;
   }
 }
 
 void Killbots::StutterStepAttack(const sc2::Units& units_,
                                  sc2::Point2D& point_) {
+  if (!stutter) return;
+
   if (stutter_frame_move == gAPI->observer().GetGameLoop()) {
-    gAPI->action().Attack(units_, point_);
+    gAPI->action().Move(units_, point_);
+    stutter_frame_move = gAPI->observer().GetGameLoop() + stutter_size;
   }
+
   if (stutter_frame_attack == gAPI->observer().GetGameLoop()) {
     gAPI->action().Attack(units_, point_);
-    stutter = false;
+    stutter_frame_attack == gAPI->observer().GetGameLoop() + stutter_size;
   }
+  if ((stutter_frame_attack + stutter) == gAPI->observer().GetGameLoop())
+    gAPI->action().Attack(units_, goal);
 }
