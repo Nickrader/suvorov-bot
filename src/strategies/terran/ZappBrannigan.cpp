@@ -46,7 +46,8 @@ void Zapp::OnStep(Builder* builder_) {
 
   if (!build_cc) BuildBarracks(minerals, builder_);
 
-  stutter.StutterStepAttack(field_units, the_alamo);
+  // stutter.StutterStepAttack(field_units, the_alamo);
+  ff.FFTarget(field_units);
 }
 
 void Zapp::OnUnitIdle(const sc2::Unit* unit_, Builder* builder_) {
@@ -107,16 +108,22 @@ void Zapp::OnUnitDestroyed(const sc2::Unit* unit_, Builder* builder_) {
 }
 
 void Zapp::OnUnitEnterVision(const sc2::Unit* unit_, Builder* builder_) {
-  if (unit_->Alliance::Enemy && sc2::IsBuilding()(unit_->unit_type)) {
-    for (auto i : buildings_enemy) {
-      if (unit_ == i) return;
+  if (unit_->Alliance::Enemy) {
+    if (sc2::IsBuilding()(unit_->unit_type)) {
+      for (auto i : buildings_enemy) {
+        if (unit_ == i) return;
+      }
+      buildings_enemy.push_back(unit_);
+      if (buildings_enemy.size() == 1 && enemy_main_destroyed)
+        AttackNextBuilding();
     }
-    buildings_enemy.push_back(unit_);
-    if (buildings_enemy.size() == 1 && enemy_main_destroyed)
-      AttackNextBuilding();
-  }
-  if (unit_->Alliance::Enemy && IsCombatUnit()(*unit_)) {
-    stutter.StutterStepInitiate({unit_->pos.x, unit_->pos.y}, enemy_main_destroyed);
+    // if (IsCombatUnit()(*unit_)) {
+    //  stutter.StutterStepInitiate({unit_->pos.x, unit_->pos.y},
+    //                              enemy_main_destroyed);
+    //}
+    if (IsWorkerUnit()(*unit_)) {
+      ff.FFInitiate(unit_);
+    }
   }
 }
 
@@ -301,4 +308,3 @@ void Zapp::BuildBarracks(const uint32_t& minerals, Builder* builder_) {
       }
   }
 }
-

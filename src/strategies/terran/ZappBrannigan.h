@@ -3,7 +3,7 @@
 Knowing their weakness, I sent wave after wave of my own men at them, until they
 reached their limit, and shutdown." -Captain Zapp Brannigan */
 
-#include <src/StutterStep.h>
+#include "src/MicroActions.h"
 
 #include "strategies/Strategy.h"
 
@@ -47,6 +47,7 @@ struct Zapp : Strategy {
   bool attacked = false;
   sc2::Point2D goal;
   StutterStep stutter;
+  FocusFire ff;
 };
 
 struct SortAttackBuildings {  // copy of logic from Hub.cpp
