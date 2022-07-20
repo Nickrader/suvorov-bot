@@ -116,7 +116,7 @@ void Zapp::OnUnitEnterVision(const sc2::Unit* unit_, Builder* builder_) {
       AttackNextBuilding();
   }
   if (unit_->Alliance::Enemy && IsCombatUnit()(*unit_)) {
-    stutter.StutterStepInitiate({unit_->pos.x, unit_->pos.y});
+    stutter.StutterStepInitiate({unit_->pos.x, unit_->pos.y}, enemy_main_destroyed);
   }
 }
 
