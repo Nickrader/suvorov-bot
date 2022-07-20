@@ -118,7 +118,7 @@ void Killbots::OnUnitEnterVision(const sc2::Unit* unit_, Builder* builder_) {
                              // main_destryoed.
   }
   if (unit_->Alliance::Enemy && IsCombatUnit()(*unit_)) {
-      StutterStepInitiate({unit_->pos.x, unit_->pos.y});
+    StutterStepInitiate({unit_->pos.x, unit_->pos.y});
   }
 }
 
@@ -278,7 +278,7 @@ void Killbots::BuildCommandcenter(const uint32_t& minerals, Builder* builder_) {
 
     if (gAPI->observer().GetFoodUsed() >= 200 && !attacked) {
       builder_->ScheduleObligatoryOrder(sc2::UNIT_TYPEID::TERRAN_COMMANDCENTER,
-                                        true);
+                                        true);  // this needs a limit. Or wait.
     }
 
     if (!attacked) {
@@ -314,22 +314,26 @@ void Killbots::StutterStepInitiate(sc2::Point2D point_) {
   return;
 }
 
-void Killbots::StutterStepAttack(const sc2::Units& units_,
-    sc2::Point2D& point_, sc2::Point2D& exit_) {
-    if (!stutter) return;
-    uint32_t x = gAPI->observer().GetGameLoop();
+void Killbots::StutterStepAttack(const sc2::Units& units_, sc2::Point2D& point_,
+                                 sc2::Point2D& exit_) {
+  if (!stutter) return;
+  uint32_t x = gAPI->observer().GetGameLoop();
 
-    if (stutter_frame_move == x) {
-        gAPI->action().Move(units_, point_);
-        stutter_frame_move = x + stutter_steps;
-    }
+  if (stutter_frame_move == x) {
+    gAPI->action().Move(units_, point_);
+    stutter_frame_move = x + stutter_steps;  // sets up a series
+  }
 
-    if (stutter_frame_attack == x) {
-        gAPI->action().Attack(units_, point_);
-        //stutter_frame_attack = x + stutter_steps;
-    }
-    if ((stutter_frame_attack + stutter_steps) == x) {
-        gAPI->action().Attack(units_, exit_);
-        stutter = false; // can have only one false in function
-    }
+  if ((stutter_frame_attack == x) && !enemy_main_destroyed) {
+    gAPI->action().Attack(units_, exit_);
+    stutter_frame_attack = x + stutter_steps;
+  }
+  if ((stutter_frame_attack == x) && enemy_main_destroyed) {
+    gAPI->action().Attack(units_, point_);
+    stutter_frame_attack = x + stutter_steps;
+  }
+  if ((stutter_frame_attack + (stutter_steps * 4)) == x) {  // magic constant 4?
+    gAPI->action().Attack(units_, exit_);
+    stutter = false;  // can have only one false in function
+  }
 }
