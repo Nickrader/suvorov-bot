@@ -18,16 +18,15 @@ namespace {
 Historican gHistory("strategy.ZappBrannigan");
 }  // namespace
 
-Killbots::Killbots() : Strategy(20.0f), stutter_target({0, 0}), goal({0, 0}) {}
+Killbots::Killbots() : Strategy(20.0f) {}
 
 void Killbots::OnGameStart(Builder* builder_) {
   // Initialize variables
   the_alamo = {gAPI->observer().GameInfo().enemy_start_locations.front().x,
                gAPI->observer().GameInfo().enemy_start_locations.front().y};
-  goal = the_alamo;
   std::cout << "\The Alamo: " << the_alamo.x << " , " << the_alamo.y
             << std::endl;
-
+  goal = the_alamo;
   // Give speech to boost morale
   std::cout << "Now, like all great plans, \
 my strategy is so simple an idiot could have devised it."
@@ -47,7 +46,7 @@ void Killbots::OnStep(Builder* builder_) {
 
   if (!build_cc) BuildBarracks(minerals, builder_);
 
-  StutterStepAttack(field_units, stutter_target, goal);
+  stutter.StutterStepAttack(field_units, the_alamo);
 }
 
 void Killbots::OnUnitIdle(const sc2::Unit* unit_, Builder* builder_) {
@@ -114,11 +113,10 @@ void Killbots::OnUnitEnterVision(const sc2::Unit* unit_, Builder* builder_) {
     }
     buildings_enemy.push_back(unit_);
     if (buildings_enemy.size() == 1 && enemy_main_destroyed)
-      AttackNextBuilding();  // here is where goal is being reassigned before
-                             // main_destryoed.
+      AttackNextBuilding();
   }
   if (unit_->Alliance::Enemy && IsCombatUnit()(*unit_)) {
-    StutterStepInitiate({unit_->pos.x, unit_->pos.y});
+    stutter.StutterStepInitiate({unit_->pos.x, unit_->pos.y});
   }
 }
 
@@ -168,7 +166,7 @@ void Killbots::DestroyedEnemyBuildings(const sc2::Unit* unit_) {
           // either.
         }
       }
-      if (!enemy_main_destroyed) gAPI->action().Attack(field_units, goal);
+      if (!enemy_main_destroyed) gAPI->action().Attack(field_units, the_alamo);
       if (enemy_main_destroyed) AttackNextBuilding();
     }
   }
@@ -301,39 +299,5 @@ void Killbots::BuildBarracks(const uint32_t& minerals, Builder* builder_) {
         builder_->ScheduleObligatoryOrder(sc2::UNIT_TYPEID::TERRAN_BARRACKS);
         ++number_of_barracks;
       }
-  }
-}
-
-void Killbots::StutterStepInitiate(sc2::Point2D point_) {
-  if (!stutter) {
-    stutter_frame_move = gAPI->observer().GetGameLoop() + 1;
-    stutter_frame_attack = gAPI->observer().GetGameLoop() + (stutter_steps / 2);
-    stutter = true;
-    stutter_target = point_;
-  }
-  return;
-}
-
-void Killbots::StutterStepAttack(const sc2::Units& units_, sc2::Point2D& point_,
-                                 sc2::Point2D& exit_) {
-  if (!stutter) return;
-  uint32_t x = gAPI->observer().GetGameLoop();
-
-  if (stutter_frame_move == x) {
-    gAPI->action().Move(units_, point_);
-    stutter_frame_move = x + stutter_steps;  // sets up a series
-  }
-
-  if ((stutter_frame_attack == x) && !enemy_main_destroyed) {
-    gAPI->action().Attack(units_, exit_);
-    stutter_frame_attack = x + stutter_steps;
-  }
-  if ((stutter_frame_attack == x) && enemy_main_destroyed) {
-    gAPI->action().Attack(units_, point_);
-    stutter_frame_attack = x + stutter_steps;
-  }
-  if ((stutter_frame_attack + (stutter_steps * 4)) == x) {  // magic constant 4?
-    gAPI->action().Attack(units_, exit_);
-    stutter = false;  // can have only one false in function
   }
 }
