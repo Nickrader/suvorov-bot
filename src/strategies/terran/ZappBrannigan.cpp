@@ -8,9 +8,6 @@
 #include "core/API.h"
 #include "core/Helpers.h"
 
-// TODO: Use my fork of sc2_api to make possible Attack() take Unit* instead of
-// vector<Unit*>?
-//
 // TODO:  Setup Git workflow, may have to be in GitBash?  Get better commits,
 // branching, etc.
 
@@ -24,59 +21,55 @@ Zapp::Zapp() : Strategy(20.0f) {}
 
 void Zapp::OnGameStart(Builder* builder_) {
   // Initialize variables
-  the_alamo = {gAPI->observer().GameInfo().enemy_start_locations.front().x,
-               gAPI->observer().GameInfo().enemy_start_locations.front().y};
-  std::cout << "\The Alamo: " << the_alamo.x << " , " << the_alamo.y
+  enemy_main = {gAPI->observer().GameInfo().enemy_start_locations.front().x,
+                gAPI->observer().GameInfo().enemy_start_locations.front().y};
+  std::cout << "\Enemy Main: " << enemy_main.x << " , " << enemy_main.y
             << std::endl;
-  goal = the_alamo;
+  goal = enemy_main;
   // Give speech to boost morale
   std::cout << "Now, like all great plans, \
 my strategy is so simple an idiot could have devised it."
             << std::endl;
 }
 
+// s
 void Zapp::OnStep(Builder* builder_) {
   Strategy::OnStep(builder_);
-  // want minerals to update on step?  Or some more delay?
+
   uint32_t minerals = gAPI->observer().GetMinerals();
 
-  //  probably a better way to control flow, this is very simple implementatoin.
-  // probably don't need to execute every step.
   build_cc = ShouldBuildExpansion();
 
   if (build_cc) BuildCommandcenter(minerals, builder_);
 
   if (!build_cc) BuildBarracks(minerals, builder_);
 
-  stutter.StutterStepAttack(field_units, the_alamo);
-  // Stutter take priority over FF right now as is very basic.
-  ff.FFTarget(field_units);
-  // problem with all these triggering by OnStep is doesn't account for
-  // anything, just marching to a clock
+  if (field_units.size() > 0) {
+    Units wutang_clan = gAPI->observer().GetUnits(sc2::Unit::Enemy);
+    const sc2::Unit* target = wutang_clan.GetClosestUnit(
+        {field_units[0]->pos.x, field_units[0]->pos.y});
+    if (target)
+      stutter.StutterStepAttack(field_units, {target->pos.x, target->pos.y},
+                                enemy_main);
+
+    // ff.FFTarget(field_units);
+  }
+  if (buildings_enemy.size() == 0 && enemy_main_destroyed) SeekEnemy();
 }
 
 void Zapp::OnUnitIdle(const sc2::Unit* unit_, Builder* builder_) {
   switch (unit_->unit_type.ToType()) {
     case sc2::UNIT_TYPEID::TERRAN_BARRACKS:
-      if (!attacked) {
-        builder_->ScheduleObligatoryOrder(sc2::UNIT_TYPEID::TERRAN_MARINE);
+      if (gAPI->observer().GetFoodUsed() < 195) {
+        builder_->ScheduleObligatoryOrder(sc2::UNIT_TYPEID::TERRAN_MARINE,
+                                          true);
         gHistory.info() << "Schedule Marine training\n";
         break;
       } else {
-        builder_->ScheduleObligatoryOrder(sc2::UNIT_TYPEID::TERRAN_MARINE,
-                                          true);
+        builder_->ScheduleObligatoryOrder(sc2::UNIT_TYPEID::TERRAN_MARINE);
         gHistory.info() << "Scheulde Marine conscription\n";
         break;
       }
-
-    case sc2::UNIT_TYPEID::TERRAN_MARINE:
-      // if (the_alamo.x - 10 < unit_->pos.x < the_alamo.x + 10) {
-      if (buildings_enemy.size() > 0)
-        gAPI->action().Attack(
-            unit_, {buildings_enemy[0]->pos.x, buildings_enemy[0]->pos.y});
-      //    }
-      //  default:
-      //    break;
   }
 }
 
@@ -117,25 +110,27 @@ void Zapp::OnUnitDestroyed(const sc2::Unit* unit_, Builder* builder_) {
     CleanUpBodies(field_units);
   }
   DestroyedEnemyBuildings(unit_);
+  DestroyedEnemyUnits(unit_);
 }
 
 void Zapp::OnUnitEnterVision(const sc2::Unit* unit_, Builder* builder_) {
   if (unit_->Alliance::Enemy) {
-    if (sc2::IsBuilding()(unit_->unit_type)) {
-      for (auto i : buildings_enemy) {
-        if (unit_ == i) return;
-      }
-      buildings_enemy.push_back(unit_);
-      if (buildings_enemy.size() == 1 && enemy_main_destroyed)
-        AttackNextBuilding();
+    AddEnemyBuilding(unit_);
+    if (buildings_enemy.size() >= 1 && enemy_main_destroyed)
+      AttackNextBuilding();
+    //    if (IsWorkerUnit()(*unit_)) {
+    // ff.FFInitiate(unit_, enemy_main_destroyed);
+    //    }
+    //-------------------------------------------------
+  }
+}
+
+void Zapp::AddEnemyBuilding(const sc2::Unit* unit_) {
+  if (sc2::IsBuilding()(unit_->unit_type)) {
+    for (auto i : buildings_enemy) {
+      if (unit_ == i) return;
     }
-    if (IsCombatUnit()(*unit_)) {
-      stutter.StutterStepInitiate({unit_->pos.x, unit_->pos.y},
-                                  enemy_main_destroyed);
-    }
-    if (IsWorkerUnit()(*unit_)) {
-      ff.FFInitiate(unit_, enemy_main_destroyed);
-    }
+    buildings_enemy.push_back(unit_);
   }
 }
 
@@ -185,9 +180,15 @@ void Zapp::DestroyedEnemyBuildings(const sc2::Unit* unit_) {
           // either.
         }
       }
-      if (!enemy_main_destroyed) gAPI->action().Attack(field_units, the_alamo);
+      if (!enemy_main_destroyed) gAPI->action().Attack(field_units, enemy_main);
       if (enemy_main_destroyed) AttackNextBuilding();
     }
+  }
+}
+
+void Zapp::DestroyedEnemyUnits(const sc2::Unit* unit_) {
+  if (unit_->alliance == sc2::Unit::Alliance::Enemy) {
+    AttackNextBuilding();
   }
 }
 
@@ -195,7 +196,7 @@ void Zapp::IsMainDestroyed(sc2::Units::iterator iter) {
   if (!enemy_main_destroyed) {
     auto& it_loc = *iter;
     sc2::Point2D unit_it_loc{it_loc->pos.x, it_loc->pos.y};
-    if (unit_it_loc == the_alamo) {
+    if (unit_it_loc == enemy_main) {
       enemy_main_destroyed = true;
     }
   }
@@ -208,15 +209,17 @@ void Zapp::AttackNextBuilding() {
 
     goal = {buildings_enemy[0]->pos.x, buildings_enemy[0]->pos.y};
     gAPI->action().Attack(field_units, goal);
-  }
-  if (buildings_enemy.size() == 0) {
-    auto& expo = gHub->GetExpansions();
-    for (int i = 0; i < expo.size() && i < field_units.size(); ++i) {
-      sc2::Units xfer{};
-      if (field_units.size() > 0) xfer.push_back(field_units[i]);
-      gAPI->action().Attack(
-          xfer, {expo[i].town_hall_location.x, expo[i].town_hall_location.y});
-    }
+  } else
+    gAPI->action().Attack(field_units, enemy_main);
+}
+
+void Zapp::SeekEnemy() {
+  auto& expo = gHub->GetExpansions();
+  for (int i = 0; i < expo.size() && i < field_units.size(); ++i) {
+    sc2::Units xfer{};
+    if (field_units.size() > 0) xfer.push_back(field_units[i]);
+    gAPI->action().Attack(
+        xfer, {expo[i].town_hall_location.x, expo[i].town_hall_location.y});
   }
 }
 
@@ -295,21 +298,20 @@ void Zapp::BuildCommandcenter(const uint32_t& minerals, Builder* builder_) {
     // just arbitrary number to avoid tons of CC in build queue.
     if (number_of_townhalls >= gHub->GetExpansions().size()) return;
 
-    if (!attacked) {
+    if (!attacked && gAPI->observer().GetFoodUsed() < 200) {
       builder_->ScheduleObligatoryOrder(sc2::UNIT_TYPEID::TERRAN_COMMANDCENTER);
       ++number_of_townhalls;
+      return;
     }
-
-    if (attacked) {
-      builder_->ScheduleOptionalOrder(sc2::UNIT_TYPEID::TERRAN_COMMANDCENTER);
+    if (!attacked && gAPI->observer().GetFoodUsed() >= 200) {
+      builder_->ScheduleObligatoryOrder(sc2::UNIT_TYPEID::TERRAN_COMMANDCENTER,
+                                        true);
+      uint32_t command_center_delay =
+          gAPI->observer().GetGameLoop() + (ten_seconds * 10);
       ++number_of_townhalls;
     }
-
-    if (gAPI->observer().GetFoodUsed() >= 200 && !attacked) {
-      builder_->ScheduleObligatoryOrder(sc2::UNIT_TYPEID::TERRAN_COMMANDCENTER,
-                                        true);  // this needs a limit. Or wait.
-      uint32_t command_center_delay =
-          gAPI->observer().GetGameLoop() + ten_seconds;
+    if (attacked) {
+      builder_->ScheduleOptionalOrder(sc2::UNIT_TYPEID::TERRAN_COMMANDCENTER);
       ++number_of_townhalls;
     }
   }

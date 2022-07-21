@@ -28,6 +28,10 @@ struct Zapp : Strategy {
 
   void IsMainDestroyed(sc2::Units::iterator it);
 
+  // is *& needed/wanted.  Auto-refactor did this along with adding a bool.
+  // work as simple pointer
+  void AddEnemyBuilding(const sc2::Unit* unit_);
+
   void AttackNextBuilding();
 
   void BuildBarracks(const uint32_t& minerals, Builder* builder_);
@@ -36,13 +40,17 @@ struct Zapp : Strategy {
 
   void DestroyedEnemyBuildings(const sc2::Unit* unit_);
 
+  void DestroyedEnemyUnits(const sc2::Unit* unit_);
+
+  void SeekEnemy();
+
   bool build_cc = false;
   int number_of_townhalls = 1;  // we start with one command center.
   int number_of_barracks = 0;
   int number_of_supplydepots = 0;
   sc2::Units buildings_enemy{};
   bool enemy_main_destroyed = false;
-  sc2::Point2D the_alamo = {0, 0};
+  sc2::Point2D enemy_main = {0, 0};
   bool attacked = false;
   sc2::Point2D goal;
   StutterStep stutter;
