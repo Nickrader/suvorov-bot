@@ -14,6 +14,8 @@
 // TODO:  Setup Git workflow, may have to be in GitBash?  Get better commits,
 // branching, etc.
 
+// TODO:  Scout cheese, have alt build, path
+
 namespace {
 Historican gHistory("strategy.ZappBrannigan");
 }  // namespace
@@ -46,7 +48,8 @@ void Zapp::OnStep(Builder* builder_) {
 
   if (!build_cc) BuildBarracks(minerals, builder_);
 
-  // stutter.StutterStepAttack(field_units, the_alamo);
+  stutter.StutterStepAttack(field_units, the_alamo);
+  // Stutter take priority over FF right now as is very basic.
   ff.FFTarget(field_units);
 }
 
@@ -117,12 +120,12 @@ void Zapp::OnUnitEnterVision(const sc2::Unit* unit_, Builder* builder_) {
       if (buildings_enemy.size() == 1 && enemy_main_destroyed)
         AttackNextBuilding();
     }
-    // if (IsCombatUnit()(*unit_)) {
-    //  stutter.StutterStepInitiate({unit_->pos.x, unit_->pos.y},
-    //                              enemy_main_destroyed);
-    //}
+     if (IsCombatUnit()(*unit_)) {
+      stutter.StutterStepInitiate({unit_->pos.x, unit_->pos.y},
+                                  enemy_main_destroyed);
+    }
     if (IsWorkerUnit()(*unit_)) {
-      ff.FFInitiate(unit_);
+      ff.FFInitiate(unit_, enemy_main_destroyed);
     }
   }
 }
