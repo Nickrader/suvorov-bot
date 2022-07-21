@@ -61,7 +61,7 @@ void Dispatcher::OnGameStart() {
         m_plugins.emplace_back(new ChargelotPush());
     } else if (current_race == sc2::Race::Terran) {
          //m_plugins.emplace_back(new MarinePush());
-        m_plugins.emplace_back(new Killbots());
+        m_plugins.emplace_back(new Zapp());
     } else if (current_race == sc2::Race::Zerg) {
         m_plugins.emplace_back(new ExtraDrone());
         m_plugins.emplace_back(new ZerglingFlood());

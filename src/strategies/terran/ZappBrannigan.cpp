@@ -18,9 +18,9 @@ namespace {
 Historican gHistory("strategy.ZappBrannigan");
 }  // namespace
 
-Killbots::Killbots() : Strategy(20.0f) {}
+Zapp::Zapp() : Strategy(20.0f) {}
 
-void Killbots::OnGameStart(Builder* builder_) {
+void Zapp::OnGameStart(Builder* builder_) {
   // Initialize variables
   the_alamo = {gAPI->observer().GameInfo().enemy_start_locations.front().x,
                gAPI->observer().GameInfo().enemy_start_locations.front().y};
@@ -33,7 +33,7 @@ my strategy is so simple an idiot could have devised it."
             << std::endl;
 }
 
-void Killbots::OnStep(Builder* builder_) {
+void Zapp::OnStep(Builder* builder_) {
   Strategy::OnStep(builder_);
   // want minerals to update on step?  Or some more delay?
   uint32_t minerals = gAPI->observer().GetMinerals();
@@ -49,7 +49,7 @@ void Killbots::OnStep(Builder* builder_) {
   stutter.StutterStepAttack(field_units, the_alamo);
 }
 
-void Killbots::OnUnitIdle(const sc2::Unit* unit_, Builder* builder_) {
+void Zapp::OnUnitIdle(const sc2::Unit* unit_, Builder* builder_) {
   switch (unit_->unit_type.ToType()) {
     case sc2::UNIT_TYPEID::TERRAN_BARRACKS:
       if (!attacked) {
@@ -67,7 +67,7 @@ void Killbots::OnUnitIdle(const sc2::Unit* unit_, Builder* builder_) {
   }
 }
 
-void Killbots::OnUnitCreated(const sc2::Unit* unit_, Builder* builder_) {
+void Zapp::OnUnitCreated(const sc2::Unit* unit_, Builder* builder_) {
   Strategy::OnUnitCreated(unit_, builder_);
   const Expansions& expansions = gHub->GetExpansions();
   sc2::Point3D natural_expansion =
@@ -86,7 +86,7 @@ void Killbots::OnUnitCreated(const sc2::Unit* unit_, Builder* builder_) {
   gAPI->action().Attack(units, rally);
 }
 
-void Killbots::OnUnitDestroyed(const sc2::Unit* unit_, Builder* builder_) {
+void Zapp::OnUnitDestroyed(const sc2::Unit* unit_, Builder* builder_) {
   if (unit_->Alliance::Self) {
     switch (unit_->unit_type.ToType()) {
       case sc2::UNIT_TYPEID::TERRAN_COMMANDCENTER:
@@ -106,7 +106,7 @@ void Killbots::OnUnitDestroyed(const sc2::Unit* unit_, Builder* builder_) {
   DestroyedEnemyBuildings(unit_);
 }
 
-void Killbots::OnUnitEnterVision(const sc2::Unit* unit_, Builder* builder_) {
+void Zapp::OnUnitEnterVision(const sc2::Unit* unit_, Builder* builder_) {
   if (unit_->Alliance::Enemy && sc2::IsBuilding()(unit_->unit_type)) {
     for (auto i : buildings_enemy) {
       if (unit_ == i) return;
@@ -120,7 +120,7 @@ void Killbots::OnUnitEnterVision(const sc2::Unit* unit_, Builder* builder_) {
   }
 }
 
-void Killbots::OnGameEnd() {
+void Zapp::OnGameEnd() {
   std::cout << "\nEnd Game:\n Barracks: " << number_of_barracks
             << "\nTownHalls: " << number_of_townhalls << std::endl;
   std::cout << "\nNumTargets: " << buildings_enemy.size() << std::endl;
@@ -151,7 +151,7 @@ void Killbots::OnGameEnd() {
   std::cout << "Enemy: " << enemy_buildings << std::endl;
 }
 
-void Killbots::DestroyedEnemyBuildings(const sc2::Unit* unit_) {
+void Zapp::DestroyedEnemyBuildings(const sc2::Unit* unit_) {
   if (unit_->alliance == sc2::Unit::Alliance::Enemy) {
     if (sc2::IsBuilding()(unit_->unit_type)) {
       for (sc2::Units::iterator it = buildings_enemy.begin();
@@ -172,7 +172,7 @@ void Killbots::DestroyedEnemyBuildings(const sc2::Unit* unit_) {
   }
 }
 
-void Killbots::IsMainDestroyed(sc2::Units::iterator iter) {
+void Zapp::IsMainDestroyed(sc2::Units::iterator iter) {
   if (!enemy_main_destroyed) {
     auto& it_loc = *iter;
     sc2::Point2D unit_it_loc{it_loc->pos.x, it_loc->pos.y};
@@ -182,7 +182,7 @@ void Killbots::IsMainDestroyed(sc2::Units::iterator iter) {
   }
 }
 
-void Killbots::AttackNextBuilding() {
+void Zapp::AttackNextBuilding() {
   if (buildings_enemy.size() > 0 && field_units.size() > 0) {
     std::sort(buildings_enemy.begin(), buildings_enemy.end(),
               SortAttackBuildings(field_units));
@@ -212,7 +212,7 @@ bool SortAttackBuildings::operator()(const sc2::Unit* lhs_,
          sc2::DistanceSquared2D({rhs_->pos.x, rhs_->pos.y}, {kb_point});
 }
 
-bool Killbots::ShouldBuildExpansion() {
+bool Zapp::ShouldBuildExpansion() {
   switch (number_of_townhalls) {
     case 1:
       if (number_of_barracks >= 1)
@@ -269,7 +269,7 @@ bool Killbots::ShouldBuildExpansion() {
 }
 
 // if under attack (townhalls decremented) then we should not build CC 'urgent')
-void Killbots::BuildCommandcenter(const uint32_t& minerals, Builder* builder_) {
+void Zapp::BuildCommandcenter(const uint32_t& minerals, Builder* builder_) {
   if (minerals >= 400) {
     // just arbitrary number to avoid tons of CC in build queue.
     if (number_of_townhalls >= gHub->GetExpansions().size()) return;
@@ -291,7 +291,7 @@ void Killbots::BuildCommandcenter(const uint32_t& minerals, Builder* builder_) {
   }
 }
 
-void Killbots::BuildBarracks(const uint32_t& minerals, Builder* builder_) {
+void Zapp::BuildBarracks(const uint32_t& minerals, Builder* builder_) {
   {
     if (gAPI->observer().CountUnitType(sc2::UNIT_TYPEID::TERRAN_SUPPLYDEPOT) >
         0)
@@ -301,3 +301,4 @@ void Killbots::BuildBarracks(const uint32_t& minerals, Builder* builder_) {
       }
   }
 }
+

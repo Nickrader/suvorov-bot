@@ -7,8 +7,8 @@ reached their limit, and shutdown." -Captain Zapp Brannigan */
 
 #include "strategies/Strategy.h"
 
-struct Killbots : Strategy {
-  Killbots();
+struct Zapp : Strategy {
+  Zapp();
 
   void OnGameStart(Builder*) final;
 
