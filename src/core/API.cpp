@@ -33,6 +33,10 @@ void Action::Attack(const sc2::Units& units_, const sc2::Point2D& point_) {
     m_action->UnitCommand(units_, sc2::ABILITY_ID::ATTACK_ATTACK, point_);
 }
 
+void Action::Attack(const sc2::Unit* unit_, const sc2::Point2D& point_) {
+    m_action->UnitCommand(unit_, sc2::ABILITY_ID::ATTACK_ATTACK, point_);
+}
+
 void Action::Attack(const sc2::Units& units_, const sc2::Unit* target_, bool queued) {
     m_action->UnitCommand(units_, sc2::ABILITY_ID::SMART, target_, queued);
 }

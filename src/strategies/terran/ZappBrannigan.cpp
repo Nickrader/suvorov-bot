@@ -51,6 +51,8 @@ void Zapp::OnStep(Builder* builder_) {
   stutter.StutterStepAttack(field_units, the_alamo);
   // Stutter take priority over FF right now as is very basic.
   ff.FFTarget(field_units);
+  // problem with all these triggering by OnStep is doesn't account for
+  // anything, just marching to a clock
 }
 
 void Zapp::OnUnitIdle(const sc2::Unit* unit_, Builder* builder_) {
@@ -66,8 +68,15 @@ void Zapp::OnUnitIdle(const sc2::Unit* unit_, Builder* builder_) {
         gHistory.info() << "Scheulde Marine conscription\n";
         break;
       }
-    default:
-      break;
+
+    case sc2::UNIT_TYPEID::TERRAN_MARINE:
+      // if (the_alamo.x - 10 < unit_->pos.x < the_alamo.x + 10) {
+      if (buildings_enemy.size() > 0)
+        gAPI->action().Attack(
+            unit_, {buildings_enemy[0]->pos.x, buildings_enemy[0]->pos.y});
+      //    }
+      //  default:
+      //    break;
   }
 }
 
@@ -120,7 +129,7 @@ void Zapp::OnUnitEnterVision(const sc2::Unit* unit_, Builder* builder_) {
       if (buildings_enemy.size() == 1 && enemy_main_destroyed)
         AttackNextBuilding();
     }
-     if (IsCombatUnit()(*unit_)) {
+    if (IsCombatUnit()(*unit_)) {
       stutter.StutterStepInitiate({unit_->pos.x, unit_->pos.y},
                                   enemy_main_destroyed);
     }
@@ -278,26 +287,31 @@ bool Zapp::ShouldBuildExpansion() {
   }
 }
 
-// if under attack (townhalls decremented) then we should not build CC 'urgent')
+// if under attack (townhalls decremented) then we should not build CC
+// 'urgent')
 void Zapp::BuildCommandcenter(const uint32_t& minerals, Builder* builder_) {
+  uint32_t ten_seconds = 224;
   if (minerals >= 400) {
     // just arbitrary number to avoid tons of CC in build queue.
     if (number_of_townhalls >= gHub->GetExpansions().size()) return;
 
-    if (gAPI->observer().GetFoodUsed() >= 200 && !attacked) {
-      builder_->ScheduleObligatoryOrder(sc2::UNIT_TYPEID::TERRAN_COMMANDCENTER,
-                                        true);  // this needs a limit. Or wait.
-    }
-
     if (!attacked) {
       builder_->ScheduleObligatoryOrder(sc2::UNIT_TYPEID::TERRAN_COMMANDCENTER);
+      ++number_of_townhalls;
     }
 
     if (attacked) {
       builder_->ScheduleOptionalOrder(sc2::UNIT_TYPEID::TERRAN_COMMANDCENTER);
+      ++number_of_townhalls;
     }
 
-    ++number_of_townhalls;
+    if (gAPI->observer().GetFoodUsed() >= 200 && !attacked) {
+      builder_->ScheduleObligatoryOrder(sc2::UNIT_TYPEID::TERRAN_COMMANDCENTER,
+                                        true);  // this needs a limit. Or wait.
+      uint32_t command_center_delay =
+          gAPI->observer().GetGameLoop() + ten_seconds;
+      ++number_of_townhalls;
+    }
   }
 }
 

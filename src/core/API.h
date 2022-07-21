@@ -28,6 +28,8 @@ struct Action {
 
     void Attack(const sc2::Units& units_, const sc2::Point2D& point_);
 
+    void Attack(const sc2::Unit* unit_, const sc2::Point2D& point_);
+
     void Attack(const sc2::Units& units_, const sc2::Unit* target_, bool queued);
 
     void Move(const sc2::Units& units_, const sc2::Point2D& point_);
