@@ -32,7 +32,7 @@ my strategy is so simple an idiot could have devised it."
             << std::endl;
 }
 
-// s
+// logic probably better driven by orders on units for micro and targeting.
 void Zapp::OnStep(Builder* builder_) {
   Strategy::OnStep(builder_);
 
@@ -44,14 +44,17 @@ void Zapp::OnStep(Builder* builder_) {
 
   if (!build_cc) BuildBarracks(minerals, builder_);
 
+  // this is flimsy, can exit without issuing command to attack default target.
   if (field_units.size() > 0) {
     Units wutang_clan = gAPI->observer().GetUnits(sc2::Unit::Enemy);
     const sc2::Unit* target = wutang_clan.GetClosestUnit(
         {field_units[0]->pos.x, field_units[0]->pos.y});
-    if (target)
-      stutter.StutterStepAttack(field_units, {target->pos.x, target->pos.y},
-                                enemy_main);
-
+    if (target) {
+      if (sc2::IsVisible()(*target)) {
+        stutter.StutterStepAttack(field_units, {target->pos.x, target->pos.y},
+                                  enemy_main, enemy_main_destroyed);
+      }
+    }
     // ff.FFTarget(field_units);
   }
   if (buildings_enemy.size() == 0 && enemy_main_destroyed) SeekEnemy();
