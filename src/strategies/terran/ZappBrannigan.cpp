@@ -20,7 +20,7 @@ namespace {
 Historican gHistory("strategy.ZappBrannigan");
 }  // namespace
 
-Zapp::Zapp() : Strategy(30.0f) {}
+Zapp::Zapp() : Strategy(16.0f) {}
 
 void Zapp::OnGameStart(Builder* builder_) {
   // Initialize variables
@@ -49,7 +49,8 @@ void Zapp::OnStep(Builder* builder_) {
 
   // this is flimsy, can exit without issuing command to attack default target.
   // target should be dynamic, not just enemy_main.
-  stutter.StutterStepAttack(field_units, enemy_main, enemy_main_destroyed);
+  UpdateGoal();
+  stutter.StutterStepAttack(field_units, goal, span);
 
   // ff.FFTarget(field_units);
   if (buildings_enemy.size() == 0 && enemy_main_destroyed) SeekEnemy();
@@ -323,5 +324,30 @@ void Zapp::BuildBarracks(const uint32_t& minerals, Builder* builder_) {
         builder_->ScheduleObligatoryOrder(sc2::UNIT_TYPEID::TERRAN_BARRACKS);
         ++number_of_barracks;
       }
+  }
+}
+
+void Zapp::UpdateGoal() {
+  if (field_units.size() < 1) return;
+  Units wutang_clan = gAPI->observer().GetUnits(sc2::Unit::Enemy);
+  const sc2::Unit* target = wutang_clan.GetClosestUnit(
+      {field_units[0]->pos.x, field_units[0]->pos.y});
+  if (target) {
+    span = sc2::DistanceSquared2D(target->pos, field_units[0]->pos);
+    // changeling is visible.  Causes problems. ChanglingMarine ID is 15.
+    // should probably be an exclusion class or enum?
+    if (target->unit_type != 15) return;
+    if (sc2::IsVisible()(*target) && (25 < span < 100)) {
+      goal = target->pos;
+      return;
+    }
+  }
+  if (!enemy_main_destroyed) {
+    goal = enemy_main;
+    return;
+  }
+  if (enemy_main_destroyed) {
+    SeekEnemy();
+    return;
   }
 }

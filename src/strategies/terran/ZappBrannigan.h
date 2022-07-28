@@ -44,6 +44,8 @@ struct Zapp : Strategy {
 
   void SeekEnemy();
 
+  void UpdateGoal();
+
   bool build_cc = false;
   int number_of_townhalls = 1;  // we start with one command center.
   int number_of_barracks = 0;
@@ -53,6 +55,7 @@ struct Zapp : Strategy {
   sc2::Point2D enemy_main = {0, 0};
   bool attacked = false;
   sc2::Point2D goal;
+  float span;
   StutterStep stutter;
   FocusFire ff;
 };
