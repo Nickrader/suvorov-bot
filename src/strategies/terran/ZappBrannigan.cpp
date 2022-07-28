@@ -13,11 +13,14 @@
 
 // TODO:  Scout cheese, have alt build, path
 
+// right now overall logic is attack main, when main destroyed, attack nearest
+// building
+
 namespace {
 Historican gHistory("strategy.ZappBrannigan");
 }  // namespace
 
-Zapp::Zapp() : Strategy(20.0f) {}
+Zapp::Zapp() : Strategy(30.0f) {}
 
 void Zapp::OnGameStart(Builder* builder_) {
   // Initialize variables
@@ -45,18 +48,10 @@ void Zapp::OnStep(Builder* builder_) {
   if (!build_cc) BuildBarracks(minerals, builder_);
 
   // this is flimsy, can exit without issuing command to attack default target.
-  if (field_units.size() > 0) {
-    Units wutang_clan = gAPI->observer().GetUnits(sc2::Unit::Enemy);
-    const sc2::Unit* target = wutang_clan.GetClosestUnit(
-        {field_units[0]->pos.x, field_units[0]->pos.y});
-    if (target) {
-      if (sc2::IsVisible()(*target)) {
-        stutter.StutterStepAttack(field_units, {target->pos.x, target->pos.y},
-                                  enemy_main, enemy_main_destroyed);
-      }
-    }
-    // ff.FFTarget(field_units);
-  }
+  // target should be dynamic, not just enemy_main.
+  stutter.StutterStepAttack(field_units, enemy_main, enemy_main_destroyed);
+
+  // ff.FFTarget(field_units);
   if (buildings_enemy.size() == 0 && enemy_main_destroyed) SeekEnemy();
 }
 
@@ -66,11 +61,11 @@ void Zapp::OnUnitIdle(const sc2::Unit* unit_, Builder* builder_) {
       if (gAPI->observer().GetFoodUsed() < 195) {
         builder_->ScheduleObligatoryOrder(sc2::UNIT_TYPEID::TERRAN_MARINE,
                                           true);
-        gHistory.info() << "Schedule Marine training\n";
+        gHistory.info() << "Schedule Marine conscription\n";
         break;
       } else {
         builder_->ScheduleObligatoryOrder(sc2::UNIT_TYPEID::TERRAN_MARINE);
-        gHistory.info() << "Scheulde Marine conscription\n";
+        gHistory.info() << "Scheulde Marine training\n";
         break;
       }
   }
@@ -119,7 +114,7 @@ void Zapp::OnUnitDestroyed(const sc2::Unit* unit_, Builder* builder_) {
 void Zapp::OnUnitEnterVision(const sc2::Unit* unit_, Builder* builder_) {
   if (unit_->Alliance::Enemy) {
     AddEnemyBuilding(unit_);
-    if (buildings_enemy.size() >= 1 && enemy_main_destroyed)
+    if (buildings_enemy.size() > 0 && enemy_main_destroyed)
       AttackNextBuilding();
     //    if (IsWorkerUnit()(*unit_)) {
     // ff.FFInitiate(unit_, enemy_main_destroyed);
@@ -310,7 +305,7 @@ void Zapp::BuildCommandcenter(const uint32_t& minerals, Builder* builder_) {
       builder_->ScheduleObligatoryOrder(sc2::UNIT_TYPEID::TERRAN_COMMANDCENTER,
                                         true);
       uint32_t command_center_delay =
-          gAPI->observer().GetGameLoop() + (ten_seconds * 10);
+          gAPI->observer().GetGameLoop() + (ten_seconds * 6);
       ++number_of_townhalls;
     }
     if (attacked) {
