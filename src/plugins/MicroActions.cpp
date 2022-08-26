@@ -1,4 +1,4 @@
-#include "src/MicroActions.h"
+#include "plugins/MicroActions.h"
 
 #include "core/API.h"
 #include "sc2api/sc2_unit_filters.h"
@@ -19,7 +19,7 @@ void StutterStep::StutterStepAttack(const sc2::Units& units_,
       stutter = true;
     }
 
-    if (stutter_frame_move == x && span_ > 16) {
+    if (stutter_frame_move == x && span_ > 9) {
       gAPI->action().Move(units_, target_);
     }
 
