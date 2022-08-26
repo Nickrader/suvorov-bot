@@ -11,6 +11,9 @@ StutterStep::StutterStep() : stutter(false) {}
 void StutterStep::StutterStepAttack(const sc2::Units& units_,
                                     sc2::Point2D target_, float span_) {
   uint32_t x = gAPI->observer().GetGameLoop();
+  if (x > (stutter_frame_attack + stutter_steps)) {
+      stutter = false;
+  }
   if (units_.size() > 0) {
     if (!stutter) {
       stutter_frame_move = gAPI->observer().GetGameLoop();
