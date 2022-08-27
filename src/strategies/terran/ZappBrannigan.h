@@ -54,8 +54,8 @@ struct Zapp : Strategy {
   bool enemy_main_destroyed = false;
   sc2::Point2D enemy_main = {0, 0};
   bool attacked = false;
-  sc2::Point2D goal;
-  float span;
+  sc2::Point2D goal = { 0, 0 };
+  float span = 0.0f;
   StutterStep stutter;
   FocusFire ff;
 };
@@ -67,3 +67,4 @@ struct SortAttackBuildings {  // copy of logic from Hub.cpp
  private:
   sc2::Point2D kb_point;
 };
+

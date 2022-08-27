@@ -3,18 +3,23 @@
 #include <sc2api/sc2_map_info.h>
 #include <sc2api/sc2_unit_filters.h>
 
+#include <fstream>
+#include <iostream>
+#include <sstream>
+
 #include "Historican.h"
 #include "Hub.h"
 #include "core/API.h"
 #include "core/Helpers.h"
 
-// TODO:  Setup Git workflow, may have to be in GitBash?  Get better commits,
-// branching, etc.
-
 // TODO:  Scout cheese, have alt build, path
+// Should want to scout after 1st rax starts?
 
-// right now overall logic is attack main, when main destroyed, attack nearest
-// building
+// TODO: examine logic. right now overall logic is attack main, when main
+// destroyed, attack nearest building
+
+// TODO:  Perhaps if first attack is total failure, change army cap that we
+// attack at???
 
 namespace {
 Historican gHistory("strategy.ZappBrannigan");
@@ -134,13 +139,19 @@ void Zapp::AddEnemyBuilding(const sc2::Unit* unit_) {
 }
 
 void Zapp::OnGameEnd() {
+  std::string game_file = "data/game_results.txt";
+  std::ofstream outFile(game_file, std::ios_base::app);
+  std::stringstream ss;
+
   std::cout << "\nEnd Game:\n Barracks: " << number_of_barracks
             << "\nTownHalls: " << number_of_townhalls << std::endl;
   std::cout << "\nNumTargets: " << buildings_enemy.size() << std::endl;
+
   for (auto i : buildings_enemy) {
     std::cout << "\n Target: " << i->pos.x << " , " << i->pos.y
               << "\n\tLast Seen: " << i->last_seen_game_loop << std::endl;
   }
+
   // at the moment, best proxy for win/lose
   auto ii = gAPI->observer().GetUnits();
   auto& i = ii.operator()();
@@ -148,20 +159,24 @@ void Zapp::OnGameEnd() {
   for (auto a : i) {
     if (sc2::IsBuilding()(a->unit_type)) {
       ++cnt;
-      std::cout << sc2::UnitTypeToName(a->unit_type) << std::endl;
+      // ss << sc2::UnitTypeToName(a->unit_type) << std::endl;
     }
   }
   if (buildings_enemy.size() <= 1 && cnt >= 1) {
     std::cout << "Call me cocky, but if there's an alien out there, I can't "
                  "kill. I haven't met him and killed him yet."
               << std::endl;
-  } else
+    ss << "Win\n";
+  } else {
     std::cout << "When I'm in command, every mission is a suicide mission."
               << std::endl;
-
+    ss << "Loss\n";
+  }
   auto enemy_buildings = buildings_enemy.size();
-  std::cout << "Mine: " << cnt << std::endl;
-  std::cout << "Enemy: " << enemy_buildings << std::endl;
+  ss << "Mine: " << cnt << std::endl;
+  ss << "Enemy: " << enemy_buildings << std::endl;
+  outFile << ss.rdbuf();
+  outFile.close();
 }
 
 void Zapp::DestroyedEnemyBuildings(const sc2::Unit* unit_) {
