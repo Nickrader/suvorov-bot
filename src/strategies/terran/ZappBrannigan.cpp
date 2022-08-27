@@ -3,7 +3,10 @@
 #include <sc2api/sc2_map_info.h>
 #include <sc2api/sc2_unit_filters.h>
 
+#include <chrono>
+#include <ctime>
 #include <fstream>
+#include <iomanip>
 #include <iostream>
 #include <sstream>
 
@@ -19,7 +22,25 @@
 // destroyed, attack nearest building
 
 // TODO:  Perhaps if first attack is total failure, change army cap that we
-// attack at???
+// attack at max
+
+std::ostream& operator<<(std::ostream& os, tm time_) {
+    os << time_.tm_year + 1900 << '-' << time_.tm_mon + 1 << '-' << time_.tm_mday
+        << "  " << time_.tm_hour << ':' << time_.tm_min << ':' << time_.tm_sec
+        << std::endl;
+    return os;
+}
+
+std::tm timestamp() {
+    auto aa =
+        std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+    std::time_t const now_c = aa;
+    std::tm tnm = {};
+    localtime_s(&tnm, &now_c);
+    return tnm;
+}
+
+
 
 namespace {
 Historican gHistory("strategy.ZappBrannigan");
@@ -142,7 +163,8 @@ void Zapp::OnGameEnd() {
   std::string game_file = "data/game_results.txt";
   std::ofstream outFile(game_file, std::ios_base::app);
   std::stringstream ss;
-
+  std::tm ts = timestamp();
+  ss << ts;
   std::cout << "\nEnd Game:\n Barracks: " << number_of_barracks
             << "\nTownHalls: " << number_of_townhalls << std::endl;
   std::cout << "\nNumTargets: " << buildings_enemy.size() << std::endl;
