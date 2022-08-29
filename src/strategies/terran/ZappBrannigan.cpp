@@ -25,22 +25,28 @@
 // attack at max
 
 std::ostream& operator<<(std::ostream& os, tm time_) {
-    os << time_.tm_year + 1900 << '-' << time_.tm_mon + 1 << '-' << time_.tm_mday
-        << "  " << time_.tm_hour << ':' << time_.tm_min << ':' << time_.tm_sec
-        << std::endl;
-    return os;
+  os << time_.tm_year + 1900 << '-' << time_.tm_mon + 1 << '-' << time_.tm_mday
+     << "  " << time_.tm_hour << ':' << time_.tm_min << ':' << time_.tm_sec
+     << std::endl;
+  return os;
 }
 
 std::tm timestamp() {
-    auto aa =
-        std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-    std::time_t const now_c = aa;
-    std::tm tnm = {};
-    localtime_s(&tnm, &now_c);
-    return tnm;
+  auto aa =
+      std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+  std::time_t const now_c = aa;
+  std::tm tnm = {};
+  localtime_s(&tnm, &now_c);
+  return tnm;
 }
 
-
+sc2::Point3D offset3D(sc2::Point3D point_, float offset_) {
+  sc2::Point3D ret_val;
+  ret_val.x = point_.x + offset_;
+  ret_val.y = point_.y + offset_;
+  ret_val.z = point_.z;
+  return ret_val;
+}
 
 namespace {
 Historican gHistory("strategy.ZappBrannigan");
@@ -55,6 +61,7 @@ void Zapp::OnGameStart(Builder* builder_) {
   std::cout << "\Enemy Main: " << enemy_main.x << " , " << enemy_main.y
             << std::endl;
   goal = enemy_main;
+
   // Give speech to boost morale
   std::cout << "Now, like all great plans, \
 my strategy is so simple an idiot could have devised it."
@@ -73,8 +80,6 @@ void Zapp::OnStep(Builder* builder_) {
 
   if (!build_cc) BuildBarracks(minerals, builder_);
 
-  // this is flimsy, can exit without issuing command to attack default target.
-  // target should be dynamic, not just enemy_main.
   UpdateGoal();
   stutter.StutterStepAttack(field_units, goal, span);
 
@@ -373,9 +378,18 @@ void Zapp::UpdateGoal() {
     span = sc2::DistanceSquared2D(target->pos, field_units[0]->pos);
     // changeling is visible.  Causes problems. ChanglingMarine ID is 15.
     // should probably be an exclusion class or enum?
-    if (target->unit_type != 15) return;
+    // unless have focus fire, should exit, no update
+    if (target->unit_type == 15) return;
     if (sc2::IsVisible()(*target) && (25 < span < 100)) {
       goal = target->pos;
+      // should be in Diagnosis.cpp ???
+      // yes, any debug rendering should happen there, so can be turned off.
+      // means I'll have to make Zapp ptr.  ???
+      for (int i = 0; i < 10; ++i) {
+        gAPI->debug().DrawBox(offset3D(target->pos, -target->radius - i / 10.0),
+                              offset3D(target->pos, target->radius + i / 10.0),
+                              sc2::Colors::Purple);
+      }
       return;
     }
   }
