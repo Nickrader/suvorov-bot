@@ -23,6 +23,10 @@ struct Zapp : Strategy {
 
   void OnGameEnd() final;
 
+  sc2::Point3D offset3D(sc2::Point3D, float);
+
+  const sc2::Unit* getTarget();
+
  private:
   bool ShouldBuildExpansion();
 
@@ -56,6 +60,7 @@ struct Zapp : Strategy {
   bool attacked = false;
   sc2::Point2D goal = { 0, 0 };
   float span = 0.0f;
+  const sc2::Unit* target;
   StutterStep stutter;
   FocusFire ff;
 };

@@ -16,4 +16,5 @@ struct Diagnosis : Plugin {
 
  private:
     bool m_draw_grids;
+    bool m_draw_target;
 };

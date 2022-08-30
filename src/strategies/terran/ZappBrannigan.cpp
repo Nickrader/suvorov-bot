@@ -40,14 +40,6 @@ std::tm timestamp() {
   return tnm;
 }
 
-sc2::Point3D offset3D(sc2::Point3D point_, float offset_) {
-  sc2::Point3D ret_val;
-  ret_val.x = point_.x + offset_;
-  ret_val.y = point_.y + offset_;
-  ret_val.z = point_.z;
-  return ret_val;
-}
-
 namespace {
 Historican gHistory("strategy.ZappBrannigan");
 }  // namespace
@@ -264,6 +256,19 @@ void Zapp::SeekEnemy() {
   }
 }
 
+sc2::Point3D Zapp::offset3D(sc2::Point3D point_, float offset_) {
+    sc2::Point3D ret_val;
+    ret_val.x = point_.x + offset_;
+    ret_val.y = point_.y + offset_;
+    ret_val.z = point_.z;
+    return ret_val;
+}
+
+const sc2::Unit* Zapp::getTarget() {
+    /*const sc2::Unit* a_target = target;*/
+    return target;
+}
+
 // copy of logic from Hub.cpp
 SortAttackBuildings::SortAttackBuildings(sc2::Units& army_) : kb_point{0, 0} {
   kb_point = {army_[0]->pos.x, army_[0]->pos.y};
@@ -376,7 +381,7 @@ void Zapp::BuildBarracks(const uint32_t& minerals, Builder* builder_) {
 void Zapp::UpdateGoal() {
   if (field_units.size() < 1) return;
   Units wutang_clan = gAPI->observer().GetUnits(sc2::Unit::Enemy);
-  const sc2::Unit* target = wutang_clan.GetClosestUnit(
+  target = wutang_clan.GetClosestUnit(
       {field_units[0]->pos.x, field_units[0]->pos.y});
   if (target) {
     span = sc2::DistanceSquared2D(target->pos, field_units[0]->pos);
@@ -386,14 +391,6 @@ void Zapp::UpdateGoal() {
     if (target->unit_type == 15) return;
     if (sc2::IsVisible()(*target) && (25 < span < 100)) {
       goal = target->pos;
-      // should be in Diagnosis.cpp ???
-      // yes, any debug rendering should happen there, so can be turned off.
-      // means I'll have to make Zapp ptr.  ???
-      for (int i = 0; i < 10; ++i) {
-        gAPI->debug().DrawBox(offset3D(target->pos, -target->radius - i / 10.0),
-                              offset3D(target->pos, target->radius + i / 10.0),
-                              sc2::Colors::Purple);
-      }
       return;
     }
   }
