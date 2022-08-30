@@ -69,15 +69,16 @@ void Diagnosis::OnStep(Builder* builder_) {
   }
 
   if (m_draw_target && gZapp->getTarget() != nullptr) {
-    for (int i = 0; i < 10; ++i) {
+    for (int i = 0; i < 15; ++i) {
       gAPI->debug().DrawBox(
           gZapp->offset3D(gZapp->getTarget()->pos,
-                          -gZapp->getTarget()->radius - i / 10.0),
+                          -gZapp->getTarget()->radius - i / 30.0),
           gZapp->offset3D(gZapp->getTarget()->pos,
-                          gZapp->getTarget()->radius + i / 10.0),
+                          gZapp->getTarget()->radius + i / 30.0),
           sc2::Colors::Purple);
     }
   }
+
   gAPI->debug().DrawText("Build order:");
 
   std::list<Order> orders = builder_->GetOrders();
