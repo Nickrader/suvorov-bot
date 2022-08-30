@@ -68,7 +68,7 @@ void Diagnosis::OnStep(Builder* builder_) {
     }
   }
 
-  if (m_draw_target && gZapp->getTarget()) {
+  if (m_draw_target && gZapp->getTarget() != nullptr) {
     for (int i = 0; i < 10; ++i) {
       gAPI->debug().DrawBox(
           gZapp->offset3D(gZapp->getTarget()->pos,
