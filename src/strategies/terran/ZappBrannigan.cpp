@@ -369,6 +369,10 @@ void Zapp::BuildBarracks(const uint32_t& minerals, Builder* builder_) {
   }
 }
 
+//Investigate:  closer, we are sending marines off to 0, 0; so the  target is
+//not being passed.
+// or is Strategy isn't passed???
+
 void Zapp::UpdateGoal() {
   if (field_units.size() < 1) return;
   Units wutang_clan = gAPI->observer().GetUnits(sc2::Unit::Enemy);
@@ -402,3 +406,5 @@ void Zapp::UpdateGoal() {
     return;
   }
 }
+
+std::unique_ptr<Zapp> gZapp;

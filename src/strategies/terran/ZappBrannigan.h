@@ -68,3 +68,7 @@ struct SortAttackBuildings {  // copy of logic from Hub.cpp
   sc2::Point2D kb_point;
 };
 
+// extern keyword fixed 'multiply defined symbols'
+// because it wasn't global without 'extern'
+// so it was being redefined everytime encountered.
+extern std::unique_ptr<Zapp> gZapp;

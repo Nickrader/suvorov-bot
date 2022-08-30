@@ -2,7 +2,6 @@
 
 #include "core/API.h"
 #include "sc2api/sc2_unit_filters.h"
-#include "strategies/terran/ZappBrannigan.h"
 
 StutterStep::StutterStep() : stutter(false) {}
 

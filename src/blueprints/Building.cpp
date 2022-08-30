@@ -5,7 +5,6 @@
 #include "Building.h"
 
 #include <Dispatcher.h>
-#include <strategies/terran/ZappBrannigan.h>
 
 #include "Hub.h"
 #include "core/API.h"
