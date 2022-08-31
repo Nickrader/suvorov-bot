@@ -24,6 +24,12 @@
 // TODO:  Perhaps if first attack is total failure, change army cap that we
 // attack at max
 
+// TODO:
+// when main destroyed and no targets, attack action is spammed bad.
+// I guess this would be one excuse to learn the profiling tools better
+// maybe way to automate/hook when acting up???
+// right now, investigate using debugger, know it is OnStep problem somewhere
+
 std::ostream& operator<<(std::ostream& os, tm time_) {
   os << time_.tm_year + 1900 << '-' << time_.tm_mon + 1 << '-' << time_.tm_mday
      << "  " << time_.tm_hour << ':' << time_.tm_min << ':' << time_.tm_sec
@@ -254,19 +260,21 @@ void Zapp::SeekEnemy() {
     gAPI->action().Attack(
         xfer, {expo[i].town_hall_location.x, expo[i].town_hall_location.y});
   }
+  uint32_t delay = game_loops_second * 10;
+  seek_enemy_delay = gAPI->observer().GetGameLoop() + delay;
 }
 
 sc2::Point3D Zapp::offset3D(sc2::Point3D point_, float offset_) {
-    sc2::Point3D ret_val;
-    ret_val.x = point_.x + offset_;
-    ret_val.y = point_.y + offset_;
-    ret_val.z = point_.z;
-    return ret_val;
+  sc2::Point3D ret_val;
+  ret_val.x = point_.x + offset_;
+  ret_val.y = point_.y + offset_;
+  ret_val.z = point_.z;
+  return ret_val;
 }
 
 const sc2::Unit* Zapp::getTarget() {
-    /*const sc2::Unit* a_target = target;*/
-    return target;
+  /*const sc2::Unit* a_target = target;*/
+  return target;
 }
 
 // copy of logic from Hub.cpp
@@ -374,13 +382,10 @@ void Zapp::BuildBarracks(const uint32_t& minerals, Builder* builder_) {
   }
 }
 
-//Investigate:  closer, we are sending marines off to 0, 0; so the  target is
-//not being passed.
-// or is Strategy isn't passed???
-
 void Zapp::UpdateGoal() {
   if (field_units.size() < 1) return;
-  Units wutang_clan = gAPI->observer().GetUnits(sc2::Unit::Enemy);
+  Units wutang_clan =
+      gAPI->observer().GetUnits(sc2::IsVisible(), sc2::Unit::Enemy);
   target = wutang_clan.GetClosestUnit(
       {field_units[0]->pos.x, field_units[0]->pos.y});
   if (target) {
@@ -399,8 +404,10 @@ void Zapp::UpdateGoal() {
     return;
   }
   if (enemy_main_destroyed) {
-    SeekEnemy();
-    return;
+    if (gAPI->observer().GetGameLoop() > seek_enemy_delay) {
+      SeekEnemy();
+      return;
+    }
   }
 }
 
