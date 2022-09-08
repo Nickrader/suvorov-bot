@@ -42,6 +42,10 @@ struct Zapp : Strategy {
 
   void BuildCommandcenter(const uint32_t& minerals, Builder* builder_);
 
+  void BuildMarine(const sc2::Unit* unit_, Builder* builder_);
+
+  void CheckIdleRaxQueue(Builder* builder_);
+
   void DestroyedEnemyBuildings(const sc2::Unit* unit_);
 
   void DestroyedEnemyUnits(const sc2::Unit* unit_);
@@ -58,13 +62,14 @@ struct Zapp : Strategy {
   bool enemy_main_destroyed = false;
   sc2::Point2D enemy_main = {0, 0};
   bool attacked = false;
-  sc2::Point2D goal = { 0, 0 };
+  sc2::Point2D goal = {0, 0};
   float span = 0.0f;
   const sc2::Unit* target = nullptr;
   StutterStep stutter;
   FocusFire ff;
   uint32_t seek_enemy_delay = 0;
   uint32_t game_loops_second = 22.4;
+  sc2::Units idlerax_queue = {};
 };
 
 struct SortAttackBuildings {  // copy of logic from Hub.cpp

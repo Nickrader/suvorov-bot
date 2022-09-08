@@ -67,10 +67,15 @@ my strategy is so simple an idiot could have devised it."
 }
 
 // logic probably better driven by orders on units for micro and targeting.
+// building logic is flimsy.  s/b better way to control flow, so marine
+// production is constant.
+
 void Zapp::OnStep(Builder* builder_) {
+  uint32_t minerals = gAPI->observer().GetMinerals();
+
   Strategy::OnStep(builder_);
 
-  uint32_t minerals = gAPI->observer().GetMinerals();
+  CheckIdleRaxQueue(builder_);
 
   build_cc = ShouldBuildExpansion();
 
@@ -88,16 +93,8 @@ void Zapp::OnStep(Builder* builder_) {
 void Zapp::OnUnitIdle(const sc2::Unit* unit_, Builder* builder_) {
   switch (unit_->unit_type.ToType()) {
     case sc2::UNIT_TYPEID::TERRAN_BARRACKS:
-      if (gAPI->observer().GetFoodUsed() < 195) {
-        builder_->ScheduleObligatoryOrder(sc2::UNIT_TYPEID::TERRAN_MARINE,
-                                          true);
-        gHistory.info() << "Schedule Marine conscription\n";
-        break;
-      } else {
-        builder_->ScheduleObligatoryOrder(sc2::UNIT_TYPEID::TERRAN_MARINE);
-        gHistory.info() << "Scheulde Marine training\n";
-        break;
-      }
+      idlerax_queue.push_back(unit_);
+      break;
   }
 }
 
@@ -253,15 +250,17 @@ void Zapp::AttackNextBuilding() {
 }
 
 void Zapp::SeekEnemy() {
-  auto& expo = gHub->GetExpansions();
-  for (int i = 0; i < expo.size() && i < field_units.size(); ++i) {
-    sc2::Units xfer{};
-    if (field_units.size() > 0) xfer.push_back(field_units[i]);
-    gAPI->action().Attack(
-        xfer, {expo[i].town_hall_location.x, expo[i].town_hall_location.y});
+  if (gAPI->observer().GetGameLoop() > seek_enemy_delay) {
+    auto& expo = gHub->GetExpansions();
+    for (int i = 0; i < expo.size() && i < field_units.size(); ++i) {
+      sc2::Units xfer{};
+      if (field_units.size() > 0) xfer.push_back(field_units[i]);
+      gAPI->action().Attack(
+          xfer, {expo[i].town_hall_location.x, expo[i].town_hall_location.y});
+    }
+    uint32_t delay = game_loops_second * 10;
+    seek_enemy_delay = gAPI->observer().GetGameLoop() + delay;
   }
-  uint32_t delay = game_loops_second * 10;
-  seek_enemy_delay = gAPI->observer().GetGameLoop() + delay;
 }
 
 sc2::Point3D Zapp::offset3D(sc2::Point3D point_, float offset_) {
@@ -382,6 +381,25 @@ void Zapp::BuildBarracks(const uint32_t& minerals, Builder* builder_) {
   }
 }
 
+void Zapp::BuildMarine(const sc2::Unit* unit_, Builder* builder_) {
+  if (gAPI->observer().GetFoodUsed() < 195 && unit_->Alliance::Self) {
+    builder_->ScheduleObligatoryOrder(sc2::UNIT_TYPEID::TERRAN_MARINE, true);
+    gHistory.info() << "Schedule Marine conscription\n";
+  } else {
+    builder_->ScheduleObligatoryOrder(sc2::UNIT_TYPEID::TERRAN_MARINE);
+    gHistory.info() << "Scheulde Marine training\n";
+  }
+}
+
+void Zapp::CheckIdleRaxQueue(Builder* builder_) {
+    for (int i = 0; i < idlerax_queue.size(); ++i) {
+        if (gAPI->observer().GetMinerals() > 50) {
+            BuildMarine(idlerax_queue.at(i), builder_);
+            idlerax_queue.erase(idlerax_queue.begin() + i);
+        }
+    }
+}
+
 void Zapp::UpdateGoal() {
   if (field_units.size() < 1) return;
   Units wutang_clan =
@@ -389,11 +407,12 @@ void Zapp::UpdateGoal() {
   target = wutang_clan.GetClosestUnit(
       {field_units[0]->pos.x, field_units[0]->pos.y});
   if (target) {
+    // Focus fire changling or worker, if target.
+    if (target->unit_type == 15 || sc2::IsWorker()(*target)) {
+      gAPI->action().Attack(field_units, target, false);
+      return;
+    }
     span = sc2::DistanceSquared2D(target->pos, field_units[0]->pos);
-    // changeling is visible.  Causes problems. ChanglingMarine ID is 15.
-    // should probably be an exclusion class or enum?
-    // unless have focus fire, should exit, no update
-    if (target->unit_type == 15) return;
     if (sc2::IsVisible()(*target) && (25 < span < 100)) {
       goal = target->pos;
       return;
