@@ -13,6 +13,10 @@ struct Strategy : Plugin {
 
   void OnUnitCreated(const sc2::Unit* unit_, Builder*) override;
 
+  void SetAttackLimit(float attack_limit_);
+
+  float GetAttackLimit();
+
  protected:
   void TransferToField(sc2::Units& units_);
 

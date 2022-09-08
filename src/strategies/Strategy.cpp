@@ -38,6 +38,12 @@ void Strategy::OnUnitCreated(const sc2::Unit* unit_, Builder*) {
   m_units.push_back(unit_);
 }
 
+void Strategy::SetAttackLimit(float attack_limit_) {
+  m_attack_limit = attack_limit_;
+}
+
+float Strategy::GetAttackLimit() { return m_attack_limit; }
+
 void Strategy::CleanUpBodies(sc2::Units& units_) {
   // Clean up dead bodies.
   auto it =
