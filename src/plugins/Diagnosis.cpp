@@ -77,11 +77,13 @@ void Diagnosis::OnStep(Builder* builder_) {
                           gZapp->getTarget()->radius + i / 30.0),
           sc2::Colors::Purple);
     }
+  }
 
-    sc2::Units aa = gZapp->getFieldUnits();
-    if (!aa.empty()) {
+  sc2::Units aa = gZapp->getFieldUnits();
+  if (!aa.empty()) {
+    for (float i = 0.0f; i < 5; ++i) {
       gAPI->debug().DrawSphere(aa.begin().operator*()->pos,
-                               aa.begin().operator*()->radius + 1,
+                               aa.begin().operator*()->radius + i/10,
                                sc2::Colors::Red);
     }
   }
