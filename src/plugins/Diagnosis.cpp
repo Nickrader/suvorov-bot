@@ -77,6 +77,13 @@ void Diagnosis::OnStep(Builder* builder_) {
                           gZapp->getTarget()->radius + i / 30.0),
           sc2::Colors::Purple);
     }
+
+    sc2::Units aa = gZapp->getFieldUnits();
+    if (!aa.empty()) {
+      gAPI->debug().DrawSphere(aa.begin().operator*()->pos,
+                               aa.begin().operator*()->radius + 1,
+                               sc2::Colors::Red);
+    }
   }
 
   gAPI->debug().DrawText("Build order:");

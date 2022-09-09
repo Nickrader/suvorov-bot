@@ -21,14 +21,9 @@
 // TODO: examine logic. right now overall logic is attack main, when main
 // destroyed, attack nearest building
 
-// TODO:  Perhaps if first attack is total failure, change army cap that we
-// attack at max
-
-// TODO:
-// when main destroyed and no targets, attack action is spammed bad.
-// I guess this would be one excuse to learn the profiling tools better
-// maybe way to automate/hook when acting up???
-// right now, investigate using debugger, know it is OnStep problem somewhere
+// TODO: Could probably have more state-based approach to strategy logic.
+// Reading about semaphores in OpenGL tutorial seemed applicable to this
+// task.
 
 std::ostream& operator<<(std::ostream& os, tm time_) {
   os << time_.tm_year + 1900 << '-' << time_.tm_mon + 1 << '-' << time_.tm_mday
@@ -47,10 +42,10 @@ std::tm timestamp() {
 }
 
 namespace {
-Historican gHistory("strategy.ZappBrannigan");
+Historican gHistory("ZappBrannigan");
 }  // namespace
 
-Zapp::Zapp() : Strategy(16.0f) {}
+Zapp::Zapp() : Strategy(20.0f) {}
 
 void Zapp::OnGameStart(Builder* builder_) {
   // Initialize variables
@@ -66,10 +61,6 @@ my strategy is so simple an idiot could have devised it."
             << std::endl;
 }
 
-// logic probably better driven by orders on units for micro and targeting.
-// building logic is flimsy.  s/b better way to control flow, so marine
-// production is constant.
-
 void Zapp::OnStep(Builder* builder_) {
   uint32_t minerals = gAPI->observer().GetMinerals();
 
@@ -77,14 +68,23 @@ void Zapp::OnStep(Builder* builder_) {
 
   CheckIdleRaxQueue(builder_);
 
-  build_cc = ShouldBuildExpansion();
+  if (idlerax_queue.empty()) {
+    build_cc = ShouldBuildExpansion();
 
-  if (build_cc) BuildCommandcenter(minerals, builder_);
+    if (build_cc) BuildCommandcenter(minerals, builder_);
 
-  if (!build_cc) BuildBarracks(minerals, builder_);
+    if (!build_cc) BuildBarracks(minerals, builder_);
+  }
 
   UpdateGoal();
   stutter.StutterStepAttack(field_units, goal, span);
+
+  // check if attacking piecemeal is failing horribly. 
+  if (field_units.size() == 1) {
+    if (enemy_dead < m_attack_limit / 3) {
+      m_attack_limit = 100.0f;
+    }
+  }
 
   // ff.FFTarget(field_units);
   if (buildings_enemy.size() == 0 && enemy_main_destroyed) SeekEnemy();
@@ -134,6 +134,11 @@ void Zapp::OnUnitDestroyed(const sc2::Unit* unit_, Builder* builder_) {
     CleanUpBodies(m_units);
     CleanUpBodies(field_units);
   }
+  if (unit_->Alliance::Enemy) {
+    IsCombatUnit(unit_);
+    ++enemy_dead;
+  }
+
   DestroyedEnemyBuildings(unit_);
   DestroyedEnemyUnits(unit_);
 }
@@ -272,8 +277,17 @@ sc2::Point3D Zapp::offset3D(sc2::Point3D point_, float offset_) {
 }
 
 const sc2::Unit* Zapp::getTarget() {
-  /*const sc2::Unit* a_target = target;*/
+  if (!target) return nullptr;
   return target;
+}
+
+const sc2::Units Zapp::getFieldUnits() {
+  if (!field_units.empty()) {
+    return field_units;
+  } else {
+    const sc2::Units empty_vector{};
+    return empty_vector;
+  }
 }
 
 // copy of logic from Hub.cpp
@@ -392,12 +406,13 @@ void Zapp::BuildMarine(const sc2::Unit* unit_, Builder* builder_) {
 }
 
 void Zapp::CheckIdleRaxQueue(Builder* builder_) {
-    for (int i = 0; i < idlerax_queue.size(); ++i) {
-        if (gAPI->observer().GetMinerals() > 50) {
-            BuildMarine(idlerax_queue.at(i), builder_);
-            idlerax_queue.erase(idlerax_queue.begin() + i);
-        }
+  for (int i = 0; i < idlerax_queue.size(); ++i) {
+    if (gAPI->observer().GetMinerals() > 50 &&
+        gAPI->observer().GetAvailableFood() > 1) {
+      BuildMarine(idlerax_queue.at(i), builder_);
+      idlerax_queue.erase(idlerax_queue.begin() + i);
     }
+  }
 }
 
 void Zapp::UpdateGoal() {

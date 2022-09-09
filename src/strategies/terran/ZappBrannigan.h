@@ -27,6 +27,8 @@ struct Zapp : Strategy {
 
   const sc2::Unit* getTarget();
 
+  const sc2::Units getFieldUnits();
+
  private:
   bool ShouldBuildExpansion();
 
@@ -69,7 +71,9 @@ struct Zapp : Strategy {
   FocusFire ff;
   uint32_t seek_enemy_delay = 0;
   uint32_t game_loops_second = 22.4;
-  sc2::Units idlerax_queue = {};
+  sc2::Units idlerax_queue{};
+
+  int enemy_dead{};
 };
 
 struct SortAttackBuildings {  // copy of logic from Hub.cpp
