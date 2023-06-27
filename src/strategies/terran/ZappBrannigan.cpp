@@ -102,7 +102,7 @@ void Zapp::OnUnitCreated(const sc2::Unit* unit_, Builder* builder_) {
   Strategy::OnUnitCreated(unit_, builder_);
   const Expansions& expansions = gHub->GetExpansions();
   sc2::Point3D natural_expansion =
-      expansions[1].town_hall_location;  // works at [0] not [1] for realtime.
+      expansions[1].town_hall_location; // error realtime.
   sc2::Point2D rally(natural_expansion.x, natural_expansion.y);
   sc2::Units units{};
 

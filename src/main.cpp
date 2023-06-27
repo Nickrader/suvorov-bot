@@ -104,7 +104,7 @@ int main(int argc, char* argv[]) {
     // coordinator.SetFullScreen(true);
 
     // NOTE (alkurbatov): Uncomment to play at normal speed.
-    // coordinator.SetRealtime(true);
+    //coordinator.SetRealtime(true);
     coordinator.SetWindowLocation(0, 312);
 
     Dispatcher bot("TrainingDummy");
