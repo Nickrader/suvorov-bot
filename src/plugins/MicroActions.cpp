@@ -54,7 +54,7 @@ void FocusFire::FFTarget(const sc2::Units& army_) {
       gAPI->action().Attack(army_, target, false);
       ++cnt;
     }
-    if (break_focus_frame == gAPI->observer().GetGameLoop()) {
+    if (break_focus_frame >= gAPI->observer().GetGameLoop()) {
       ff = false;
       cnt = 0;
     }

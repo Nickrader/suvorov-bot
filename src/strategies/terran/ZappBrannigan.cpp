@@ -79,14 +79,14 @@ void Zapp::OnStep(Builder* builder_) {
   UpdateGoal();
   stutter.StutterStepAttack(field_units, goal, span);
 
-  // check if attacking piecemeal is failing horribly. 
+  // check if attacking piecemeal is failing horribly.
   if (field_units.size() == 1) {
     if (enemy_dead < m_attack_limit / 3) {
       m_attack_limit = 100.0f;
     }
   }
 
-  // ff.FFTarget(field_units);
+  ff.FFTarget(field_units);
   if (buildings_enemy.size() == 0 && enemy_main_destroyed) SeekEnemy();
 }
 
@@ -102,7 +102,7 @@ void Zapp::OnUnitCreated(const sc2::Unit* unit_, Builder* builder_) {
   Strategy::OnUnitCreated(unit_, builder_);
   const Expansions& expansions = gHub->GetExpansions();
   sc2::Point3D natural_expansion =
-      expansions[1].town_hall_location; // error realtime.
+      expansions[1].town_hall_location;  // error realtime.
   sc2::Point2D rally(natural_expansion.x, natural_expansion.y);
   sc2::Units units{};
 
@@ -148,10 +148,9 @@ void Zapp::OnUnitEnterVision(const sc2::Unit* unit_, Builder* builder_) {
     AddEnemyBuilding(unit_);
     if (buildings_enemy.size() > 0 && enemy_main_destroyed)
       AttackNextBuilding();
-    //    if (IsWorkerUnit()(*unit_)) {
-    // ff.FFInitiate(unit_, enemy_main_destroyed);
-    //    }
-    //-------------------------------------------------
+    if (IsWorkerUnit()(*unit_)) {
+      ff.FFInitiate(unit_, enemy_main_destroyed);
+    }
   }
 }
 
