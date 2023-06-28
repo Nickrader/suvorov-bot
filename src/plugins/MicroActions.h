@@ -5,16 +5,16 @@ struct StutterStep {
   StutterStep();
 
   void StutterStepAttack(const sc2::Units& units_, sc2::Point2D target_,
-                         float span_);
+                         float span_, const sc2::Unit* enemy_);
 
-  void FocusFire(const sc2::Units& units_, sc2::Point2D target_);
+  void FocusFire(const sc2::Units& units_, const sc2::Unit* target_);
 
  private:
   uint32_t marine_range = 5;
   bool stutter;
   uint32_t stutter_frame_attack = 0;  // TODO: fix garbage value
   uint32_t stutter_frame_move = 0;    // or is OK b/c game start on 0 ???
-  uint32_t stutter_steps = 12;  // gameloops for 1 full stutter (move + attack)
+  uint32_t steps_per_loop = 12;  // gameloops for 1 full stutter (move + attack)
 };
 
 // struct FocusFire {

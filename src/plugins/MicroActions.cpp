@@ -8,16 +8,17 @@ StutterStep::StutterStep() : stutter(false) {}
 // still have mixed feelings about span_ parameter, but no wrapping
 // my head around alternative.  When close enough, don't want move command.
 void StutterStep::StutterStepAttack(const sc2::Units& units_,
-                                    sc2::Point2D target_, float span_) {
+                                    sc2::Point2D target_, float span_,
+                                    const sc2::Unit* enemy_) {
   uint32_t x = gAPI->observer().GetGameLoop();
-  if (x > (stutter_frame_attack + stutter_steps)) {
-      stutter = false;
+  if (x > (stutter_frame_attack + steps_per_loop)) {
+    stutter = false;
   }
   if (units_.size() > 0) {
     if (!stutter) {
       stutter_frame_move = gAPI->observer().GetGameLoop();
       stutter_frame_attack =
-          gAPI->observer().GetGameLoop() + (stutter_steps / 2);
+          gAPI->observer().GetGameLoop() + (steps_per_loop / 2);
       stutter = true;
     }
 
@@ -26,38 +27,27 @@ void StutterStep::StutterStepAttack(const sc2::Units& units_,
     }
 
     if (stutter_frame_attack == x) {
-
       gAPI->action().Attack(units_, target_);
+      FocusFire(units_, enemy_);
     }
 
-    if ((stutter_frame_attack + stutter_steps) == x) {
+    if ((stutter_frame_attack + steps_per_loop) == x) {
       gAPI->action().Attack(units_, target_);
+      FocusFire(units_, enemy_);
       stutter = false;
     }
   }
 }
 
-void FocusFire::FFInitiate(const sc2::Unit* target_, bool main_) {
-  if (!ff && main_) {
-    uint32_t duration_gameloops = 12;
-    break_focus_frame = gAPI->observer().GetGameLoop() + duration_gameloops;
-    ff = true;
-    target = target_;
+void StutterStep::FocusFire(const sc2::Units& units_,
+                            const sc2::Unit* target_) {
+  if (target_) {
+    sc2::Units tmp;
+    for (const sc2::Unit* a : units_) {
+      if (sc2::Distance2D(a->pos, target_->pos) <= marine_range)
+        tmp.push_back(a);
+    }
+    gAPI->action().Attack(tmp, target_, true);
   }
 }
 
-// 1. Want to pick closest target, right now using a gameloop to wait.
-// 2. Want to incorporate stutter into the target.
-
-void FocusFire::FFTarget(const sc2::Units& army_) {
-  if (ff) {
-    if (cnt < 1) {
-      gAPI->action().Attack(army_, target, false);
-      ++cnt;
-    }
-    if (break_focus_frame >= gAPI->observer().GetGameLoop()) {
-      ff = false;
-      cnt = 0;
-    }
-  }
-}
