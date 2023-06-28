@@ -3,11 +3,11 @@
 #include "core/API.h"
 #include "sc2api/sc2_unit_filters.h"
 
-StutterStep::StutterStep() : stutter(false) {}
+MicroActions::MicroActions() : stutter(false) {}
 
 // still have mixed feelings about span_ parameter, but no wrapping
 // my head around alternative.  When close enough, don't want move command.
-void StutterStep::StutterStepAttack(const sc2::Units& units_,
+void MicroActions::StutterStepAttack(const sc2::Units& units_,
                                     sc2::Point2D target_, float span_,
                                     const sc2::Unit* enemy_) {
   uint32_t x = gAPI->observer().GetGameLoop();
@@ -39,15 +39,14 @@ void StutterStep::StutterStepAttack(const sc2::Units& units_,
   }
 }
 
-void StutterStep::FocusFire(const sc2::Units& units_,
+void MicroActions::FocusFire(const sc2::Units& units_,
                             const sc2::Unit* target_) {
   if (target_) {
     sc2::Units tmp;
     for (const sc2::Unit* a : units_) {
-      if (sc2::Distance2D(a->pos, target_->pos) <= marine_range)
+      if (sc2::Distance2D(a->pos, target_->pos) <= GetRange(a))
         tmp.push_back(a);
     }
     gAPI->action().Attack(tmp, target_, true);
   }
 }
-

@@ -67,7 +67,7 @@ struct Zapp : Strategy {
   sc2::Point2D goal = {0, 0};
   float span = 0.0f;
   const sc2::Unit* target = nullptr;
-  StutterStep stutter;
+  MicroActions stutter;
   uint32_t seek_enemy_delay = 0;
   uint32_t game_loops_second = 22.4;
   sc2::Units idlerax_queue{};
