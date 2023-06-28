@@ -44,7 +44,7 @@ void MicroActions::FocusFire(const sc2::Units& units_,
   if (target_) {
     sc2::Units tmp;
     for (const sc2::Unit* a : units_) {
-      if (sc2::Distance2D(a->pos, target_->pos) <= GetRange(a))
+      if (sc2::Distance2D(a->pos, target_->pos) <= GetUnitRange(a))
         tmp.push_back(a);
     }
     gAPI->action().Attack(tmp, target_, true);
