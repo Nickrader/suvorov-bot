@@ -16,6 +16,9 @@ void ChatterBox::OnGameStart(Builder*) {
 
     gAPI->action().SendMessage(hello);
     gAPI->action().SendMessage("gl hf");
+
+    gAPI->action().SendMessage("Type 'target' to see targeting boxes.\n\
+        The purple box indicates A-Move targeting position, not unit.");
 }
 
 void ChatterBox::OnStep(Builder*) {
