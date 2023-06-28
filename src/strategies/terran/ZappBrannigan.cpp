@@ -86,7 +86,7 @@ void Zapp::OnStep(Builder* builder_) {
     }
   }
 
-  ff.FFTarget(field_units);
+  // ff.FFTarget(field_units); // eats up resources, try moving into stutterstep, on exit.
   if (buildings_enemy.size() == 0 && enemy_main_destroyed) SeekEnemy();
 }
 

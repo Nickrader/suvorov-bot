@@ -26,6 +26,7 @@ void StutterStep::StutterStepAttack(const sc2::Units& units_,
     }
 
     if (stutter_frame_attack == x) {
+
       gAPI->action().Attack(units_, target_);
     }
 

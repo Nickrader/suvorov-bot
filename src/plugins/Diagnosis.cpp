@@ -83,10 +83,20 @@ void Diagnosis::OnStep(Builder* builder_) {
   if (!aa.empty()) {
     for (float i = 0.0f; i < 5; ++i) {
       gAPI->debug().DrawSphere(aa.begin().operator*()->pos,
-                               aa.begin().operator*()->radius + i/10,
+                               aa.begin().operator*()->radius + i / 10,
                                sc2::Colors::Red);
     }
   }
+  //if (m_draw_target && gZapp->getTarget() != nullptr) {
+  //  for (int i = 0; i < 15; ++i) {
+  //    gAPI->debug().DrawBox(
+  //        gZapp->offset3D(gZapp->getTarget()->pos,
+  //                        -gZapp->getTarget()->radius - i / 30.0),
+  //        gZapp->offset3D(gZapp->getTarget()->pos,
+  //                        gZapp->getTarget()->radius + i / 30.0),
+  //        sc2::Colors::Yellow);
+  //  }
+  //}
 
   gAPI->debug().DrawText("Build order:");
 
