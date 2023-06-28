@@ -50,3 +50,8 @@ void MicroActions::FocusFire(const sc2::Units& units_,
     gAPI->action().Attack(tmp, target_, true);
   }
 }
+
+uint32_t MicroActions::GetUnitRange(const sc2::Unit* unit_) {
+    auto& a = unit_ranges.find(unit_->unit_type);
+    return a->second;
+}
