@@ -10,6 +10,10 @@ build/
 # IDE - VSCode
 .vscode/
 .#*
+.vs/
 
 # Google linter
 cpplint.py
+
+#submodules
+contrib/

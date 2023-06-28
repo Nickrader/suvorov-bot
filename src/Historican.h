@@ -8,37 +8,37 @@
 #include <iostream>
 
 struct TypeWriter {
-    ~TypeWriter();
+  ~TypeWriter();
 
-    void RedirectToFile(const std::string& filename_);
+  void RedirectToFile(const std::string& filename_);
 
-    template <class T>
-    TypeWriter& operator<<(const T& data_) {
-        if (m_file.is_open())
-            m_file << data_;
+  template <class T>
+  TypeWriter& operator<<(const T& data_) {
+    if (m_file.is_open()) m_file << data_;
 
-        std::cout << data_;
+    std::cout << data_;
 
-        return *this;
-    }
+    return *this;
+  }
 
-    TypeWriter& operator<<(std::ostream& (*manipulator_)(std::ostream&));
+  TypeWriter& operator<<(std::ostream& (*manipulator_)(std::ostream&));
 
  private:
-    std::ofstream m_file;
+  std::ofstream m_file;
+
 };
 
 struct Historican {
-    explicit Historican(const std::string topic_);
+  explicit Historican(const std::string topic_);
 
-    static void Init(const std::string& filename_);
+  static void Init(const std::string& filename_);
 
-    TypeWriter& info() const;
+  TypeWriter& info() const;
 
-    TypeWriter& warning() const;
+  TypeWriter& warning() const;
 
-    TypeWriter& error() const;
+  TypeWriter& error() const;
 
  private:
-    std::string m_topic;
+  std::string m_topic;
 };
